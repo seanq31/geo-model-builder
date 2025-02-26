@@ -1,0 +1,9 @@
+point
+line
+circle
+acute-tri
+acute-iso-tri
+iso-tri
+right-tri
+triangle
+polygon

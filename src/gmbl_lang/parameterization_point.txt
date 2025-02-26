@@ -1,0 +1,9 @@
+on-circ
+on-line
+on-major-arc
+on-minor-arc
+in-poly
+on-ray
+on-ray-opp
+on-seg
+

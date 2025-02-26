@@ -23,6 +23,7 @@ class InstructionReader:
         self.points = list()
         self.circles = list()
         self.lines = list()
+        self.all_lines = list()
 
         self.instructions = list()
         self.problem_lines = problem_lines
@@ -37,8 +38,27 @@ class InstructionReader:
         for cmd in cmds:
             try:
                 self.process_command(cmd)
+                self.compute_all_lines()
             except:
                 raise RuntimeError(f"Invalid command: {cmd}")
+            
+    def compute_all_lines(self):
+        cnt = len(reader.points)
+        if cnt != 0:
+            for i in range(cnt):
+                for j in range(i):
+                    self.all_lines += [''.join(['(line ', reader.points[i], ' ', reader.points[j], ')'])]
+                    
+        return
+
+    def add_cmd(self, cmd):
+        try:
+            self.process_command(cmd)
+            self.compute_all_lines()
+        except:
+            return False
+            #raise RuntimeError(f"Invalid command: {cmd}")
+        return True
 
     def register_pt(self, p):
         if p in self.points:
