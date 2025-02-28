@@ -50,5 +50,5 @@ if __name__ == "__main__":
     # lines = open(args['problem'], 'r').readlines()
     # args['lines'] = lines
 
-    num_steps = 1
-    generate_graph(num_steps, args)
+    num_steps = 10
+    generate_graph(args, num_steps)
