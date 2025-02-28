@@ -135,7 +135,7 @@ def generate_next_line(reader):
     #obj_type = 'point'
     #line = "".join(['(', first_word, ' ', obj_name, ' ', obj_type, ')'])
 
-    print(line)
+    #print(line)
     return line
 
 
@@ -187,9 +187,9 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
             print('Reached max attemps!!!')
             return [readers, figs]
         
-        print('Generate step: ' + str(cnt_steps + 1) + ', attemp: ' + str(cnt_fail + 1))
+        #print('Generate step: ' + str(cnt_steps + 1) + ', attemp: ' + str(cnt_fail + 1))
         line = generate_next_line(reader)
-        print('generated line: ' + line)
+        #print('generated line: ' + line)
         line_is_feasible, reader = add_new_line(reader, line)
         
         # check if feasible
