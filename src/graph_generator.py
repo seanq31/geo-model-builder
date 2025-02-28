@@ -42,7 +42,7 @@ def get_first_word(reader):
 
 def get_obj_type(first_word):
     if first_word == 'define':
-        #obj_type = random.sample(['point', 'line', 'circle', 'number'])
+        #obj_type = random.sample(['point', 'line', 'circle', 'number'], 1)[0]
         obj_type = random.sample(['point', 'line', 'circle'], 1)[0]
     else:
         obj_type = random.sample(gmbl_dict['param'], 1)[0]
@@ -164,7 +164,7 @@ def add_new_line(reader: InstructionReader, line: str):
 
 def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: InstructionReader=None, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_fail=1000):
     if steps_to_draw is None:
-        steps_to_draw = [1, (num_steps + 1) // 2, num_steps]
+        steps_to_draw = [1, (num_steps + 1) // 2, num_steps + 1]
 
     # get the GMBL language bank
     global gmbl_dict
@@ -202,7 +202,7 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
                     reader = InstructionReader(reader.problem_lines)
                     figs += [solve_draw(opts, reader, show_plot, save_plot, outf_prefix, encode_fig)]
                     readers += [reader]
-                    print('\n######################## Lines drawn above ########################')
+                    print('######################## Lines drawn above ########################')
                     print(reader.problem_lines)
                     print('')
                     cp_lines = copy.copy(reader.problem_lines)
