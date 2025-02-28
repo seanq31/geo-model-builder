@@ -164,7 +164,7 @@ def add_new_line(reader: InstructionReader, line: str):
 
 def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: InstructionReader=None, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_fail=1000):
     if steps_to_draw is None:
-        steps_to_draw = [1, (num_steps + 1) // 2, num_steps + 1]
+        steps_to_draw = [1, (num_steps + 1) // 2, num_steps]
 
     # get the GMBL language bank
     global gmbl_dict
@@ -181,7 +181,7 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
     lines_fail = []
     readers = []
     figs = []
-    while cnt_steps < num_steps + 1 and cnt_fail < max_fail:
+    while cnt_steps < num_steps and cnt_fail < max_fail:
         num_attempts_all += 1
         if num_attempts_all > 1e4:
             print('Reached max attemps!!!')
