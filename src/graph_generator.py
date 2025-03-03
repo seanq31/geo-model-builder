@@ -33,7 +33,6 @@ def get_first_word(reader):
         'param',
         'define',
         'assert',
-        'assert'
     ]
     first_word = random.sample(first_word_list, 1)[0]
 
@@ -150,6 +149,10 @@ def generate_next_line(reader):
         
         line = "".join(['(param ', obj_name, ' polygon)'])
         temp_lines = [line]
+        # temp_lines = []
+        # for ii in range(4):
+        #     line = ''.join(['(param P', str(cnt + 1 + ii), ' point)'])
+        #     temp_lines += [line]
         temp_lines += ['(assert (para (line P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (line P' + str(cnt + 3) + ' P' + str(cnt + 4) + ')))']
 
         if obj_type in ['parallelogram', 'rectangle', 'square', 'diamond']:
@@ -159,7 +162,7 @@ def generate_next_line(reader):
             temp_lines += ['(assert (perp (line P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (line P' + str(cnt + 1) + ' P' + str(cnt + 4) + ')))']
         
         if obj_type in ['square', 'diamond']:
-            temp_lines += ['(assert (= (dist P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (dist P' + str(cnt + 1) + ' P' + str(cnt + 4) + ')))']
+            temp_lines += ['(assert (cong P' + str(cnt + 1) + ' P' + str(cnt + 2) + ' P' + str(cnt + 1) + ' P' + str(cnt + 4) + '))']
 
         return temp_lines
 
@@ -184,13 +187,13 @@ def add_new_line(reader: InstructionReader, line: str):
         return [True, reader]
 
     # try adding the new line
-    lines = copy.copy(reader.problem_lines)
+    lines = copy.deepcopy(reader)
     cmd = parse_sexprs([line])[0]
     try:
         reader.add_cmd(cmd)
         reader.problem_lines += [line]
     except:
-        reader = InstructionReader(lines)
+        reader = InstructionReader(lines.problem_lines)
         return [False, reader]
 
     return [True, reader]
@@ -239,15 +242,20 @@ def generate_graph(opts, num_steps: int, num_eval: int=1, steps_to_draw: list=No
                     print('######################## Lines drawn above ########################')
                     print(reader.problem_lines)
                     print('')
-                    cp_lines = copy.copy(reader.problem_lines)
+                    cp_lines = copy.deepcopy(reader)
                 except:
                     cnt_fail = 0
                     if cp_lines is None:
                         reader = None
                         cnt_steps = 0
                     else:
-                        reader = InstructionReader(cp_lines)
-                        cnt_steps = len(cp_lines)
+                        reader = InstructionReader(cp_lines.problem_lines)
+                        temp_draw = [i for i, x in enumerate(steps_to_draw) if x == cnt_steps][0]
+                        if temp_draw == 0:
+                            cnt_steps = 0
+                        else:
+                            cnt_steps = steps_to_draw[temp_draw - 1]
+                        cp_lines = copy.deepcopy(reader)
         else:
             cnt_fail += 1
             lines_fail += [line]
@@ -257,11 +265,12 @@ def generate_graph(opts, num_steps: int, num_eval: int=1, steps_to_draw: list=No
             return [readers, figs]
     
     # get evaluation results
+    pr_reader_num = len(readers)
     cnt_eval = 0
     cnt_eval_attempt = 0
     while cnt_eval < num_eval and cnt_eval_attempt < max_eval_attempt:
         cnt_eval_attempt += 1
-        reader, fig = generate_eval(opts, readers[num_steps - 1], max_eval_attempt=max_eval_attempt)
+        reader, fig = generate_eval(opts, readers[pr_reader_num - 1], max_eval_attempt=max_eval_attempt)
         if reader is not None:
             cnt_eval += 1
             readers += [reader]
