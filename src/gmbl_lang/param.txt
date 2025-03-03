@@ -6,3 +6,9 @@ acute-iso-tri
 iso-tri
 right-tri
 triangle
+equi-tri
+trapezoid
+parallelogram
+rectangle
+diamond
+square

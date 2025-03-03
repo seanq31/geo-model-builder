@@ -12,7 +12,7 @@ def get_name_special_param(obj_type, reader):
     else:
         cnt = len(reader.points)
 
-    if obj_type in ['acute-tri', 'acute-iso-tri', 'iso-tri', 'right-tri', 'triangle']:
+    if obj_type in ['acute-tri', 'acute-iso-tri', 'iso-tri', 'right-tri', 'triangle', 'equi-tri']:
         obj_name = "".join(['(P', str(cnt + 1),
                             ' P', str(cnt + 2), 
                             ' P', str(cnt + 3),
@@ -24,6 +24,12 @@ def get_name_special_param(obj_type, reader):
             obj_name += 'P' + str(cnt + i + 1) + ' '
         obj_name = obj_name[: -1]
         obj_name += ')'
+    elif obj_type in ['trapezoid', 'parallelogram', 'rectangle', 'square', 'diamond']:
+        obj_name = "".join(['(P', str(cnt + 1),
+                            ' P', str(cnt + 2), 
+                            ' P', str(cnt + 3),
+                            ' P', str(cnt + 4),
+                            ')'])
 
     if obj_type in ['acute-iso-tri', 'iso-tri', 'right-tri']:
         samp = 'P' + str(random.sample(range(3), 1)[0] + 1 + cnt)

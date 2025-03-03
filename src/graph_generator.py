@@ -142,7 +142,28 @@ def generate_next_line(reader):
     if first_word == 'param' and obj_type == 'circle' and relation is None:
         line = 'skip this line'
 
-    return line
+    if first_word == 'param' and obj_type in ['trapezoid', 'parallelogram', 'rectangle', 'square', 'diamond']:
+        if reader is None or reader.points is None:
+            cnt = 0
+        else:
+            cnt = len(reader.points)
+        
+        line = "".join(['(param ', obj_name, ' polygon)'])
+        temp_lines = [line]
+        temp_lines += ['(assert (para (line P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (line P' + str(cnt + 3) + ' P' + str(cnt + 4) + ')))']
+
+        if obj_type in ['parallelogram', 'rectangle', 'square', 'diamond']:
+            temp_lines += ['(assert (para (line P' + str(cnt + 1) + ' P' + str(cnt + 4) + ') (line P' + str(cnt + 2) + ' P' + str(cnt + 3) + ')))']
+
+        if obj_type in ['rectangle', 'square']:
+            temp_lines += ['(assert (perp (line P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (line P' + str(cnt + 1) + ' P' + str(cnt + 4) + ')))']
+        
+        if obj_type in ['square', 'diamond']:
+            temp_lines += ['(assert (= (dist P' + str(cnt + 1) + ' P' + str(cnt + 2) + ') (dist P' + str(cnt + 1) + ' P' + str(cnt + 4) + ')))']
+
+        return temp_lines
+
+    return [line]
 
 
 def generate_next_eval(first_word, reader):
@@ -196,9 +217,12 @@ def generate_graph(opts, num_steps: int, num_eval: int=1, steps_to_draw: list=No
     figs = []
     while cnt_steps < num_steps and cnt_fail < max_fail:
         #print('Generate step: ' + str(cnt_steps + 1) + ', attemp: ' + str(cnt_fail + 1))
-        line = generate_next_line(reader)
+        lines = generate_next_line(reader)
         #print('generated line: ' + line)
-        line_is_feasible, reader = add_new_line(reader, line)
+        line_is_feasible = True
+        for line in lines:
+            temp_feasible, reader = add_new_line(reader, line)
+            line_is_feasible = line_is_feasible and temp_feasible
         
         # check if feasible
         if line_is_feasible:
@@ -247,7 +271,7 @@ def generate_graph(opts, num_steps: int, num_eval: int=1, steps_to_draw: list=No
 
 
 def generate_eval(opts, reader, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_eval_attempt=100):
-    num_steps = len(reader.problem_lines)
+    cnt_pr_lines = len(reader.problem_lines)
     cnt_eval = 0
     cnt_eval_attempt = 0
     num_eval = 1
@@ -258,7 +282,7 @@ def generate_eval(opts, reader, show_plot=True, save_plot=False, outf_prefix=Non
             try:
                 reader = InstructionReader(reader.problem_lines)
             except:
-                reader = InstructionReader(reader.problem_lines[:num_steps])
+                reader = InstructionReader(reader.problem_lines[:cnt_pr_lines])
                 continue
             
             cnt_eval_attempt += 1
@@ -266,7 +290,7 @@ def generate_eval(opts, reader, show_plot=True, save_plot=False, outf_prefix=Non
             try:
                 fig = solve_draw(opts, reader, show_plot, save_plot, outf_prefix, encode_fig)
             except:
-                reader = InstructionReader(reader.problem_lines[:num_steps])
+                reader = InstructionReader(reader.problem_lines[:cnt_pr_lines])
             finally:
                 if fig != []:
                     cnt_eval += 1                    
