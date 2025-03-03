@@ -4,9 +4,13 @@ centroid
 circumcenter
 excenter
 foot
+harmonic-conj
 incenter
 inter-cc
 inter-ll
 inter-lc
+isogonal-conj
+isotomic-conj
 midp
+mixtilinear-incenter
 orthocenter

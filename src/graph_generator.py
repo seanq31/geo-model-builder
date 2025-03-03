@@ -97,14 +97,14 @@ def get_relation(first_word, obj_type, reader):
         else:
             relation = 'any'
     
-    relation = specify_relation(relation, reader)
+    relation = specify_relation(first_word, relation, reader)
 
     return relation
 
 
-def get_predicate(reader):
+def get_predicate(first_word, reader):
     predicate = random.sample(gmbl_dict['predicate'], 1)[0]
-    predicate = specify_relation(predicate, reader)
+    predicate = specify_relation(first_word, predicate, reader)
 
     return predicate
 
@@ -127,7 +127,7 @@ def generate_next_line(reader):
             line = "".join(['(', first_word, ' ', obj_name, ' ', obj_type, ')'])
         
     else:
-        relation = get_predicate(reader)
+        relation = get_predicate(first_word, reader)
         line = "".join(['(', first_word, ' ', relation, ')'])
 
     #first_word = 'param'
@@ -136,6 +136,19 @@ def generate_next_line(reader):
     #line = "".join(['(', first_word, ' ', obj_name, ' ', obj_type, ')'])
 
     #print(line)
+
+    if first_word == 'param' and obj_type == 'point' and relation is None:
+        line = 'skip this line'
+    if first_word == 'param' and obj_type == 'circle' and relation is None:
+        line = 'skip this line'
+
+    return line
+
+
+def generate_next_eval(first_word, reader):
+    relation = get_predicate(first_word, reader)
+    line = "".join(['(eval ', relation, ')'])
+
     return line
 
 
@@ -162,7 +175,7 @@ def add_new_line(reader: InstructionReader, line: str):
     return [True, reader]
 
 
-def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: InstructionReader=None, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_fail=1000):
+def generate_graph(opts, num_steps: int, num_eval: int=1, steps_to_draw: list=None, reader: InstructionReader=None, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_fail=1000, max_eval_attempt=100):
     if steps_to_draw is None:
         steps_to_draw = [1, (num_steps + 1) // 2, num_steps]
 
@@ -182,11 +195,6 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
     readers = []
     figs = []
     while cnt_steps < num_steps and cnt_fail < max_fail:
-        num_attempts_all += 1
-        if num_attempts_all > 1e4:
-            print('Reached max attemps!!!')
-            return [readers, figs]
-        
         #print('Generate step: ' + str(cnt_steps + 1) + ', attemp: ' + str(cnt_fail + 1))
         line = generate_next_line(reader)
         #print('generated line: ' + line)
@@ -200,7 +208,9 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
             if cnt_steps in steps_to_draw:
                 try:
                     reader = InstructionReader(reader.problem_lines)
-                    figs += [solve_draw(opts, reader, show_plot, save_plot, outf_prefix, encode_fig)]
+                    num_attempts_all += 1
+                    fig = solve_draw(opts, reader, show_plot, save_plot, outf_prefix, encode_fig)            
+                    figs += [fig]
                     readers += [reader]
                     print('######################## Lines drawn above ########################')
                     print(reader.problem_lines)
@@ -214,12 +224,61 @@ def generate_graph(opts, num_steps: int, steps_to_draw: list=None, reader: Instr
                     else:
                         reader = InstructionReader(cp_lines)
                         cnt_steps = len(cp_lines)
-
         else:
             cnt_fail += 1
             lines_fail += [line]
-
+        
+        if num_attempts_all > 1e4:
+            print('Reached max attemps!!!')
+            return [readers, figs]
+    
+    # get evaluation results
+    cnt_eval = 0
+    cnt_eval_attempt = 0
+    while cnt_eval < num_eval and cnt_eval_attempt < max_eval_attempt:
+        cnt_eval_attempt += 1
+        reader, fig = generate_eval(opts, readers[num_steps - 1], max_eval_attempt=max_eval_attempt)
+        if reader is not None:
+            cnt_eval += 1
+            readers += [reader]
+            figs += [fig]
+    
     return [readers, figs]
+
+
+def generate_eval(opts, reader, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False, max_eval_attempt=100):
+    num_steps = len(reader.problem_lines)
+    cnt_eval = 0
+    cnt_eval_attempt = 0
+    num_eval = 1
+    while cnt_eval < num_eval and cnt_eval_attempt < max_eval_attempt:
+        line_eval = generate_next_eval('eval', reader)
+        eval_is_feasible, reader = add_new_line(reader, line_eval)
+        if eval_is_feasible:
+            try:
+                reader = InstructionReader(reader.problem_lines)
+            except:
+                reader = InstructionReader(reader.problem_lines[:num_steps])
+                continue
+            
+            cnt_eval_attempt += 1
+            fig = []
+            try:
+                fig = solve_draw(opts, reader, show_plot, save_plot, outf_prefix, encode_fig)
+            except:
+                reader = InstructionReader(reader.problem_lines[:num_steps])
+            finally:
+                if fig != []:
+                    cnt_eval += 1                    
+                    print('######################## Lines drawn above ########################')
+                    print(reader.problem_lines)
+                    print('')
+
+        if cnt_eval_attempt >= max_eval_attempt:
+            print('Reach max eval attempts!')
+            return [None, None]
+
+    return [reader, fig]
 
 
 def solve_draw(opts, reader, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=False):
@@ -250,7 +309,11 @@ def solve_draw(opts, reader, show_plot=True, save_plot=False, outf_prefix=None, 
         if not (encode_fig or show_plot or save_plot):
             figs.append(m)
         else:
-            figs.append(m.plot(show=show_plot, save=save_plot, fname=f"{outf_prefix}_{i}.png", return_fig=encode_fig, show_unnamed=opts['unnamed_objects']))
+            m.plot(show=show_plot, save=save_plot, fname=f"{outf_prefix}_{i}.png", return_fig=encode_fig, show_unnamed=opts['unnamed_objects'])
+            figs.append(m)
+    
+    if figs == []:
+        raise RuntimeError(f"Fail to solve this graph!")
     
     return figs
 

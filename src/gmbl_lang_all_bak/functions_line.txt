@@ -1,3 +1,5 @@
 line
+isogonal
+isotomic
 perp-bis
 perp-at

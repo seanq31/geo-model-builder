@@ -1,0 +1,99 @@
+<root-selector>指选择其中一个解,,
+Appendix A Fucntions,,
+名称,类型,翻译
+(amidp-opp A B C)    ,点,弧AB（不包含C）的中点
+(amidp-same A B C)   ,点,弧ACB的中点
+(centroid A B C)     ,点,三角形ABC的重心
+(circumcenter A B C) ,点,三角形ABC的外心
+(excenter A B C),点,三角形ABC中角A对应的旁心
+(foot A L1),点,点A到直线L1的垂足
+(harmonic-conj C A B),点,点C关于AB的调和共轭点
+(incenter A B C),点,三角形ABC的内心
+(inter-cc C1 C2 <root-selector>),点,圆C1和圆C2的交点
+(inter-ll L1 L2),点,直线L1和直线L2的交点
+(inter-lc L1 C1 <root-selector>),点,直线L1和圆C1的交点
+(isogonal-conj D A B C),点,点D关于三角形ABC的等角共轭点
+(isotomic-conj D A B C),点,点D关于三角形ABC的等距共轭点
+(midp A B),点,线段AB的中点
+(mixtilinear-incenter A B C),点,三角形ABC中角A的伪内切圆圆心
+(orthocenter A B C),点,三角形ABC的垂心
+(connecting A B),线,直线AB
+(isogonal D A B C),线,直线AD关于三角形ABC的等角（共轭？）线
+(isotomic D A B C),线,直线AD关于三角形ABC的等距（共轭？）线
+(perp-bis A B),线,线段AB的垂直平分线
+(perp-at A L1),线,过点A且垂直与直线L1的直线
+(c3 A B C),圆,过点A、点B、点C的圆
+(circumcircle A B C),圆,三角形ABC的外接圆
+(excircle A B C),圆,三角形ABC的角A对应的旁切圆
+(incircle A B C),圆,三角形ABC的内切圆圆心
+(mixtilinear-incircle A B C),圆,三角形ABC的角A对应的伪内切圆
+(diam A B),圆,以线段AB为直径的圆
+,,
+,,
+,,
+Appendix B Predicates,,
+名称,翻译,
+(centroid P A B C),点P是三角形ABC的重心,
+(concur L1 L2 L3),直线L1、L2、L3交于一点,
+(circumcenter P A B C),点P是三角形ABC的外心,
+(cong A B C D),|AB| = |CD|,
+(contri A B C D E F),三角形ABC和三角形DEF全等,
+(coll A B C),点A、B、C共线,
+(cycl P1 ... PN ),点P1、…、点PN共圆,
+(eq-ratio A B C D E F G H),|AB| \ |CD| = |EF| \ |GH|,
+(foot P A L1),点P是点A到直线L1的垂足,
+(incenter P A B C),点P是三角形ABC的内心,
+(inter-ll P L1 L2),点P是直线L1和L2的交点,
+(midp P A B),点P是线段AB的中点,
+(on-circ P C1),点P在圆C1上,
+(on-line P L1),点P在直线L1上,
+(on-ray P A B),点P在向量AB上,
+(on-seg P A B),点P在线段AB上,
+(opp-sides A B L1),点A和点B在直线L1的两侧,
+(orthocenter P A B C),点P是三角形ABC的垂心,
+(perp L1 L2),直线L1垂直于直线L2,
+(para L1 L2),直线L1平行于直线L2,
+(same-side A B L1),点A和点B在直线L1的同侧,
+(sim-tri A B C D E F),三角形ABC和三角形DEF相似,
+(tangent-cc C1 C2),圆C1和圆C2相切,
+(tangent-lc L1 C1),直线L1和圆C1相切,
+(tangent-at-cc A C1 C2),圆C1和圆C2相切于点A,
+(tangent-at-lc A L1 C1),直线L1和圆C1相切于点A,
+,,
+Appendix C Parameterizations,,
+名称,翻译,类型
+(on-circ C1),在圆C1上,的点
+(on-line L1),在直线L1上,的点
+(on-major-arc C1 A B),在圆C1中的优弧AB上,的点
+(on-minor-arc C1 A B),在圆C1中的劣弧AB上,的点
+(in-poly P1 ... PN ),在多边形P1，…，PN内,的点
+(on-ray A B),在向量AB上,的点
+(on-ray-opp A B),在向量BA上,的点
+(on-seg A B),在线段AB上,的点
+(tangent-lc C1),与圆C1相切,的线
+(through A),经过点A,的线
+(tangent-cc C1),与圆C1相切,的圆
+(tangent-cl L1),与直线L1相切,的圆
+(through A),经过点A,的圆
+(origin A),以A为圆心,的圆
+,,
+,,
+,,
+Appendix C 特殊的Parameterizations,,
+名称,翻译,
+(param (P Q R) acute-tri),锐角三角形PQR,
+(param (P Q R)  (acute-iso-tri Q)),等腰锐角三角形PQR，QP=QR,
+(param (P Q R)  (iso-tri Q)),等腰三角形，QP=QR,
+(param (P Q R)  (right-tri Q)),直角三角形PQR，角Q为直角,
+(param (P Q R) triangle),三角形PQR,
+(param (P1 … PN) polygon),多边形P1…PN,
+,,
+,,
+,,
+Appendix C Root Selectors,,
+rs-arbitrary,任意一个解,
+(rs-neq A),与点A不同的解,
+(rs-opp-sides A L1),与点A在直线L1不同侧的解,
+(rs-same-side A L1),与点A在直线L1同侧的解,
+(rs-closer-to-p A),与点A更接近的解,
+(rs-closer-to-l L1),与直线L1更接近的解,

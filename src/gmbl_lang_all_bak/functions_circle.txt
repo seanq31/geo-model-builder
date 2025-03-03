@@ -2,4 +2,5 @@ c3
 circumcircle
 excircle
 incircle
+mixtilinear-incircle
 diam
