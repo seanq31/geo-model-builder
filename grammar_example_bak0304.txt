@@ -1,0 +1,373 @@
+以下内容是GMBL语法下define函数能够使用的function,第一列是function名称及形式,第二列是define出来的类型,第三列是这个function的含义。
+(amidp-opp A B C),点,弧AB(不包含C)的中点
+(amidp-same A B C),点,弧ACB的中点
+(centroid A B C),点,三角形ABC的重心
+(circumcenter A B C),点,三角形ABC的外心
+(excenter A B C),点,三角形ABC中角A对应的旁心
+(foot A L1),点,点A到直线L1的垂足
+(incenter A B C),点,三角形ABC的内心
+(inter-cc C1 C2 <root-selector>),点,圆C1和圆C2的交点
+(inter-ll L1 L2),点,直线L1和直线L2的交点
+(inter-lc L1 C1 <root-selector>),点,直线L1和圆C1的交点
+(midp A B),点,线段AB的中点
+(orthocenter A B C),点,三角形ABC的垂心
+(line A B),线,直线AB
+(perp-bis A B),线,线段AB的垂直平分线
+(perp-at A L1),线,过点A且垂直与直线L1的直线
+(reflect-ll L1 L2),线,线L1关于L2的对称线
+(circ A B C),圆,过点A、点B、点C的圆
+(circumcircle A B C),圆,三角形ABC的外接圆
+(excircle A B C),圆,三角形ABC的角A对应的旁切圆
+(incircle A B C),圆,三角形ABC的内切圆
+(diam A B),圆,以线段AB为直径的圆
+(coa A B),圆,以点A为圆心且经过点B的圆
+(add N1 N2),数,N1加N2
+(area A B C),数,三角形ABC的面积
+(dist A B),数,线段AB的长度
+(div N1 N2),数,N1除以N2
+(mul N1 N2),数,N1乘以N2
+pi,数,圆周率数值
+(pow N1 N2),数,N1的N2次方
+(neg N1),数,负N1
+(radius C1),数,圆C1的半径
+(sqrt N1),数,根号N1
+(uangle A B C),数,角ABC的角度
+
+以下内容是GMBL语法下assert函数能够使用的predicate,第一列是predicate名称及形式,第二列是这个predicate的含义。
+(concur L1 L2 L3),直线L1、L2、L3交于一点
+(cong A B C D),|AB| = |CD|
+(con-tri A B C D E F),三角形ABC和三角形DEF全等
+(coll A B C),点A、点B、点C三点共线
+(cycl P1 ... PN ),点P1、…、点PN共圆
+(= A B),点A和点B是同一个点
+(= N1 N2),N1等于N2
+(eq-ratio A B C D E F G H),|AB|除以|CD| = |EF|除以|GH|
+(foot P A L1),点P是点A到直线L1的垂足
+(> N1 N2),N1大于N2
+(>= N1 N2),N1大于等于N2
+(gt N1 N2),N1大于N2
+(gte N1 N2),N1大于等于N2
+(inter-ll P L1 L2),点P是直线L1和L2的交点
+(< N1 N2),N1小于N2
+(<= N1 N2),N1小于等于N2
+(lt N1 N2),N1小于N2
+(lte N1 N2),N1小于等于N2
+(midp P A B),点P是线段AB的中点
+(on-circ P C1),点P在圆C1上
+(on-line P L1),点P在直线L1上
+(on-ray P A B),点P在向量AB上
+(on-seg P A B),点P在线段AB上
+(opp-sides A B L1),点A和点B在直线L1的两侧
+(perp L1 L2),直线L1垂直于直线L2
+(para L1 L2),直线L1平行于直线L2
+(same-side A B L1),点A和点B在直线L1的同侧
+(sim-tri A B C D E F),三角形ABC和三角形DEF相似
+
+以下内容是GMBL语法下param函数能够使用的parameterization,第一列是parameterization名称及形式,第二列是param出来的类型,第三列是这个parameterization的含义。
+(on-circ C1),在圆C1上,的点
+(on-line L1),在直线L1上,的点
+(on-major-arc C1 A B),在圆C1中的优弧AB上,的点
+(on-minor-arc C1 A B),在圆C1中的劣弧AB上,的点
+(in-poly P1 ... PN ),在多边形P1，…，PN内,的点
+(on-ray A B),在向量AB上,的点
+(on-ray-opp A B),在向量BA上,的点
+(on-seg A B),在线段AB上,的点
+(tangent-lc C1),与圆C1相切,的线
+(through A),经过点A,的线
+(tangent-cc C1),与圆C1相切,的圆
+(tangent-cl L1),与直线L1相切,的圆
+(through A),经过点A,的圆
+(origin A),以A为圆心,的圆
+
+
+以下内容是GMBL语法下param函数能够使用的一些特殊的parameterization,第一列是整个param语句的示例,第二列是这个parameterization的含义。
+(param (P Q R) acute-tri),锐角三角形PQR,
+(param (P Q R)  (acute-iso-tri Q)),等腰锐角三角形PQR且QP=QR,
+(param (P Q R)  (iso-tri Q)),等腰三角形PQR且QP=QR,
+(param (P Q R)  (right-tri Q)),直角三角形PQR且角Q为直角,
+(param (P Q R) triangle),三角形PQR,
+(param (P1 … PN) polygon),多边形P1…PN,
+
+
+以下内容是GMBL语法下root-selector对应的root-selector形式,第一列是整个root-selector的示例,第二列是这个root-selector的含义。
+rs-arbitrary,任意一个解,
+(rs-neq A),与点A不同的解,
+(rs-opp-sides A L1),与点A在直线L1不同侧的解,
+(rs-same-side A L1),与点A在直线L1同侧的解,
+(rs-closer-to-p A),与点A更接近的解,
+(rs-closer-to-l L1),与直线L1更接近的解,
+
+
+以下内容是GMBL语法画几何图的示例
+;; eg1
+(param (A B C) triangle)
+(param D point)
+(assert (on-seg D A B))
+
+;; eg2
+(param (A B C) acute-tri)
+(param X point (on-seg (midp A B) B))
+
+;; eg3
+(param (A B C) triangle)
+(param D point)
+(param E point)
+(define Gamma circle (incircle (midp A (midp B E)) D C))
+
+;; eg4
+(param lineA line)
+(param gamma circle)
+(define D point (inter-lc lineA gamma rs-arbitrary))
+(define E point (inter-lc lineA gamma (rs-neq D)))
+
+;; eg5
+(PARAM (A B C) (iso-tri A))
+(define gamma CIRCLE (circumciRcle A B C))
+(param D point (on-circ gamma))
+
+;; eg6
+(param circA circle)
+(param circB circle)
+(assert (tangent-cc circA circB))
+
+;; eg7
+(param (A B C) triangle)
+(param myLine line (through A))
+
+;; eg8
+(param (A B C D) polygon)
+(define E line (reflect-ll (line C D) (line A B)))
+
+;; eg9
+(param Gamma circle)
+(param l line)
+
+;; eg10
+(define A point (inter-lc l Gamma rs-arbitrary))
+(define B point (inter-lc l Gamma (rs-neq A)))
+
+;; eg11
+(param Omega circle)
+(define C point (inter-lc l Omega (rs-closer-to-p A)))
+(define D point (inter-lc l Omega (rs-neq C)))
+
+;; eg12
+(define E point (inter-cc Gamma Omega (rs-closer-to-l l)))
+(define F point (inter-cc Gamma Omega (rs-neq E)))
+
+;; eg13
+(param myLine line)
+(param A point)
+(define B point (reflect-pl A myLine))
+
+;; eg14
+(param Gamma circle)
+(param A point (on-circ Gamma))
+(param B point (on-circ Gamma))
+(param C point (on-major-arc Gamma B A))
+
+;; eg15
+(param Gamma circle)
+(param l line)
+(define A point (inter-lc l Gamma rs-arbitrary))
+(define B point (inter-lc l Gamma (rs-neq A)))
+(param Omega circle)
+(define C point (inter-lc l Omega (rs-closer-to-p A)))
+(define D point (inter-lc l Omega (rs-neq C)))
+(define E point (inter-cc Gamma Omega (rs-closer-to-l l)))
+(define F point (inter-cc Gamma Omega (rs-neq E)))
+
+;; eg16
+(param C point)
+(param D point)
+(param M point (on-seg C D))
+(param A point)
+(param N point (on-circ (circ C A M)))
+(define B point (inter-lc (para-at A (line C D)) (circ N M D) rs-arbitrary))
+(assert (tangent-lc (line A B) (circ C A M)))
+(assert (tangent-lc (line A B) (circ N M B)))
+(define P point (inter-ll (line N A) (line C M)))
+(define Q point (inter-ll (line N B) (line M D)))
+(define E point (inter-ll (line C A) (line D B)))
+(assert (on-ray E D B))
+(assert (on-ray E C A))
+
+;; eg17
+(param (A1 A2 A3) acute-tri)
+(define K1 point (foot A1 (line A2 A3)))
+(define K2 point (foot A2 (line A1 A3)))
+(define K3 point (foot A3 (line A1 A2)))
+(define L1 point (inter-lc (line A2 A3) (incircle A1 A2 A3) rs-arbitrary))
+(define L2 point (inter-lc (line A1 A3) (incircle A1 A2 A3) rs-arbitrary))
+(define L3 point (inter-lc (line A1 A2) (incircle A1 A2 A3) rs-arbitrary))
+(define refl1 line (reflect-ll (line K1 K2) (line L1 L2)))
+(define refl2 line (reflect-ll (line K2 K3) (line L2 L3)))
+(define refl3 line (reflect-ll (line K3 K1) (line L3 L1)))
+
+;; eg18
+(param (A B C) acute-tri)
+(define O point (circumcenter A B C))
+(define P point (foot A (line B C)))
+(assert (gte (uangle B C A) (add (uangle A B C) (div pi 6))))
+
+;; eg19
+(param (A B C) triangle)
+(define P point (inter-ll (i-bisector B A C) (line B C)))
+(define Q point (inter-ll (i-bisector A B C) (line C A)))
+(assert (= (uangle B A C) (div pi 3)))
+(assert (= (add (dist A B) (dist B P)) (add (dist A Q) (dist Q B))))
+
+;; eg20
+(param B point)
+(param C point)
+(define O point (midp B C))
+(param A point (on-circ (coa O B)))
+(assert (gt (uangle A O C) (div pi 3)))
+(define E point (inter-lc (perp-bis A O) (coa O B) rs-arbitrary))
+(define F point (inter-lc (perp-bis A O) (coa O B) (rs-neq E)))
+(define D point (amidp-opp A B C))
+(define J point (inter-ll (para-at O (line A D)) (line A C)))
+
+;; eg21
+(param (A B C D E F) polygon)
+(assert (= (dist (midp A B) (midp D E)) (mul (div (sqrt 3) 2) (add (dist A B) (dist D E)))))
+(assert (= (dist (midp B C) (midp E F)) (mul (div (sqrt 3) 2) (add (dist B C) (dist E F)))))
+(assert (= (dist (midp C D) (midp F A)) (mul (div (sqrt 3) 2) (add (dist C D) (dist F A)))))
+
+;; eg22
+(param (A B C D) polygon)
+(assert (cycl A B C D))
+(define P point (foot D (line A B)))
+(define Q point (foot D (line B C)))
+(define R point (foot D (line C A)))
+(assert (cong R P R Q))
+
+;; eg23
+(param (A B C) acute-tri)
+(assert (not (cong A B A C)))
+(define M point (inter-lc (line A B) (diam B C) (rs-neq B)))
+(define N point (inter-lc (line A C) (diam B C) (rs-neq C)))
+(define O point (midp B C))
+(define R point (inter-ll (i-bisector B A C) (i-bisector M O N)))
+
+;; eg24
+(param (A B C D) polygon)
+(assert (not (on-line D (i-bisector A B C))))
+(assert (not (on-line B (i-bisector C D A))))
+(param P point (in-poly A B C D))
+(assert (= (uangle P B C) (uangle D B A)))
+(assert (= (uangle P D C) (uangle B D A)))
+(assert (cycl A B C D))
+
+;; eg25
+(param (A B C) equi-tri)
+(param A1 point (on-seg B C))
+(param A2 point (on-seg A1 C))
+(param B1 point (on-seg C A))
+(param B2 point (on-seg B1 A))
+(param C1 point (on-seg A B))
+(param C2 point (on-seg C1 B))
+(assert (cong A1 A2 A2 B1))
+(assert (cong A1 A2 B1 B2))
+(assert (cong A1 A2 B2 C1))
+(assert (cong A1 A2 C1 C2))
+(assert (cong A1 A2 C2 A1))
+
+;; eg26
+(param (A B C D) polygon)
+(assert (cong B C D A))
+(assert (not (para (line B C) (line D A))))
+(param E point (on-seg B C))
+(param F point (on-seg D A))
+(assert (cong B E D F))
+(define P point (inter-ll (line A C) (line B D)))
+(define Q point (inter-ll (line B D) (line E F)))
+(define R point (inter-ll (line E F) (line A C)))
+
+;; eg27
+(param (A B C) triangle)
+(define I point (incenter A B C))
+(param P point (in-poly A B C))
+(assert (= (add (uangle P B A) (uangle P C A)) (add (uangle P B C) (uangle P C B))))
+
+;; eg28
+(param (B C D) polygon)
+(param E point (on-circ (circumcircle B C D)))
+(define A point (inter-ll (para-at D (line B C)) (para-at B (line D C))))
+(define F point (inter-lc (line D C) (coa E C) (rs-neq C)))
+(assert (on-seg F D C))
+(define l line (line F A))
+(define G point (inter-ll l (line B C)))
+(assert (cong E F E G))
+
+;; eg29
+(param (A B C) triangle)
+(define R point (inter-lc (i-bisector B C A) (circumcircle A B C) (rs-neq C)))
+(define P point (inter-ll (i-bisector B C A) (perp-bis B C)))
+(define Q point (inter-ll (i-bisector B C A) (perp-bis A C)))
+(define K point (midp B C))
+(define L point (midp A C))
+
+;; eg30
+(param (A B C) acute-tri)
+(define H point (orthocenter A B C))
+(define A1 point (inter-lc (line B C) (coa (midp B C) H) rs-arbitrary))
+(define A2 point (inter-lc (line B C) (coa (midp B C) H) (rs-neq A1)))
+(define B1 point (inter-lc (line C A) (coa (midp C A) H) rs-arbitrary))
+(define B2 point (inter-lc (line C A) (coa (midp C A) H) (rs-neq B1)))
+(define C1 point (inter-lc (line A B) (coa (midp A B) H) rs-arbitrary))
+(define C2 point (inter-lc (line A B) (coa (midp A B) H) (rs-neq C1)))
+
+;; eg31
+(param (A B C D) polygon)
+(assert (not (cong B A B C)))
+(define omega_1 circle (incircle A B C))
+(define omega_2 circle (incircle A D C))
+(param omega circle (tangent-cl (line B A)))
+(assert (on-ray (inter-lc (line B A) omega rs-arbitrary) B A))
+(assert (not (on-seg (inter-lc (line B A) omega rs-arbitrary) B A)))
+(assert (tangent-lc (line B C) omega))
+(assert (on-ray (inter-lc (line B C) omega rs-arbitrary) B C))
+(assert (tangent-lc (line A D) omega))
+(assert (tangent-lc (line C D) omega))
+
+;; eg32
+(param (A B C) triangle)
+(define O point (circumcenter A B C))
+(param P point (on-seg C A))
+(param Q point (on-seg A B))
+(define K point (midp B P))
+(define L point (midp C Q))
+(define M point (midp P Q))
+(define Gamma circle (circ K L M))
+(assert (tangent-lc (line P Q) Gamma))
+
+;; eg33
+(param (A B C) triangle)
+(define I point (incenter A B C))
+(define Gamma circle (circumcircle A B C))
+(define D point (inter-lc (line A I) Gamma (rs-neq A)))
+(param E point (on-circ Gamma))
+(assert (same-side D E (line B C)))
+(param F point (on-seg B C))
+(assert (= (uangle B A F) (uangle C A E)))
+(assert (lt (uangle C A E) (mul 0.5 (uangle B A C))))
+(define G point (midp I F))
+
+;; eg34
+(param (A B C) triangle)
+(param P point (in-poly A B C))
+(define Gamma circle (circumcircle A B C))
+(define K point (inter-lc (line A P) Gamma (rs-neq A)))
+(define L point (inter-lc (line B P) Gamma (rs-neq B)))
+(define M point (inter-lc (line C P) Gamma (rs-neq C)))
+(define S point (inter-ll (perp-at C (line C (origin Gamma))) (line A B)))
+(assert (cong S C S P))
+
+;; eg35
+(param (A B C) acute-tri)
+(define Gamma circle (circumcircle A B C))
+(param l line (tangent-lc Gamma))
+(define la line (reflect-ll l (line B C)))
+(define lb line (reflect-ll l (line C A)))
+(define lc line (reflect-ll l (line A B)))
