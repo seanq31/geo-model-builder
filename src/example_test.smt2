@@ -1,8 +1,6 @@
-(param O point)
-(param A point)
-(define Gamma circle (coa O A))
-(assert (= (dist O A) 5))      ;; 设定圆半径为5
-(param B point (on-circ Gamma)) ;; B在圆上
-(define M point (midp A B))     ;; AB中点
-(assert (= (dist O M) 3))       ;; 中点距圆心3
-(eval (= (dist A B) 8))         ;; 验证弦长是否为8
+(param (A B C) (right-tri B))
+(assert (= (dist A B) 6))
+(assert (= (dist B C) 8))
+(define D point (midp A C))
+(define E point (foot B (line A C)))
+(eval (= (dist D E) (div 15 5)))
