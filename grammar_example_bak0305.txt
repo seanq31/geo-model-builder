@@ -83,13 +83,12 @@ pi,数,圆周率数值
 
 
 以下内容是GMBL语法下param函数能够使用的一些特殊的parameterization,第一列是整个param语句的示例,第二列是这个parameterization的含义。
+(param (P Q R) acute-tri),锐角三角形PQR,
+(param (P Q R)  (acute-iso-tri Q)),等腰锐角三角形PQR且QP=QR,
 (param (P Q R)  (iso-tri Q)),等腰三角形PQR且QP=QR,
 (param (P Q R)  (right-tri Q)),直角三角形PQR且角Q为直角,
 (param (P Q R) triangle),三角形PQR,
 (param (P1 … PN) polygon),多边形P1…PN,
-(param (P Q R S) parallelogram),平行四边形PQRS,
-(param (P Q R S) rectangle),矩形PQRS,
-(param (P Q R S) square),正方形PQRS,
 
 
 以下内容是GMBL语法下root-selector对应的root-selector形式,第一列是整个root-selector的示例,第二列是这个root-selector的含义。
@@ -109,7 +108,7 @@ rs-arbitrary,任意一个解,
 (eval (coll A B C))
 
 ;; eg2
-(param (A B C) tri)
+(param (A B C) acute-tri)
 (param X point (on-seg (midp A B) B))
 (eval (on-seg (midp A B) A B))
 
@@ -199,8 +198,3 @@ rs-arbitrary,任意一个解,
 (assert (= (uangle A B C) (mul pi 0.2)))
 (assert (= (uangle B A C) (mul pi 0.3)))
 (eval (= (uangle A N M) (mul pi 0.5)))
-
-;; eg 15
-(param (A B C D) parallelogram)
-(param (E F G H) rectangle)
-(param (I J K L) square)

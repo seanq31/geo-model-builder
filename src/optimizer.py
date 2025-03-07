@@ -383,10 +383,9 @@ class Optimizer(ABC):
 
 
     def sample_polygon(self, ps):
-        #if len(ps) < 4:
-        if len(ps) < 3:
+        if len(ps) < 4:
             if self.verbosity > 0:
-                print("WARNING: sample_polygon expecting >3 points")
+                print("WARNING: sample_polygon expecting > 3 points")
 
         angle_zs = [self.mkvar(name=f"polygon_angle_zs_{i}", lo=-2.0, hi=2.0) for i in range(len(ps))]
         multiplicand = ((len(ps) - 2) / len(ps)) * math.pi
@@ -395,8 +394,10 @@ class Optimizer(ABC):
         scale_zs = [self.mkvar(name=f"polygon_scale_zs_{i}", lo=-2.0, hi=2.0) for i in range(len(ps))]
         scales = [0.5 * self.tanh(0.2 * sz) for sz in scale_zs]
 
-        Ps = [self.get_point(self.const(-2.0), self.const(0.0)),
-              self.get_point(self.const(2.0), self.const(0.0))]
+        # Ps = [self.get_point(self.const(-2.0), self.const(0.0)),
+        #       self.get_point(self.const(2.0), self.const(0.0))]
+        Ps = [self.get_point(x=self.mkvar(str(ps[0])+"x", lo=-3, hi=0), y=self.mkvar(str(ps[0])+"y", lo=0, hi=3)),
+              self.get_point(x=self.mkvar(str(ps[1])+"x", lo=0, hi=3), y=self.mkvar(str(ps[1])+"y", lo=-3, hi=0))]
         s = self.dist(Ps[0], Ps[1])
 
         for i in range(2, len(ps) + 1):
@@ -447,30 +448,37 @@ class Optimizer(ABC):
         self.register_pt(nC, C)
 
     def sample_triangle(self, ps, iso=None, right=None, acute=False, equi=False):
-        if not (iso or right or acute or equi):
-            # return self.sample_polygon(ps)
-            return self.sample_triangle_on_unit_circ(ps)
+        # if not (iso or right or acute or equi):
+        #     # return self.sample_polygon(ps)
+        #     return self.sample_triangle_on_unit_circ(ps)
+        
+        # P   = self.get_point(x=self.mkvar(str(p)+"x", lo=lo, hi=hi),
+        #                      y=self.mkvar(str(p)+"y", lo=lo, hi=hi))
+        # self.register_pt(p, P, save_name=save_name)
 
         [nA, nB, nC] = ps
-        B = self.get_point(self.const(-2.0), self.const(0.0))
-        C = self.get_point(self.const(2.0), self.const(0.0))
+        #B = self.get_point(self.const(-2.0), self.const(0.0))
+        #C = self.get_point(self.const(2.0), self.const(0.0))
+        A = self.get_point(x=self.mkvar(str(nA)+"x", lo=-2, hi=2), y=self.mkvar(str(nA)+"y", lo=-2, hi=2))
+        B = self.get_point(x=self.mkvar(str(nB)+"x", lo=-2, hi=2), y=self.mkvar(str(nB)+"y", lo=-2, hi=2))
+        C = self.get_point(x=self.mkvar(str(nC)+"x", lo=-2, hi=2), y=self.mkvar(str(nC)+"y", lo=-2, hi=2))
 
-        if iso is not None or equi:
-            Ax = self.const(0)
-        else:
-            #Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=False)
-            Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=True)
+        # if iso is not None or equi:
+        #     Ax = self.const(0)
+        # else:
+        #     #Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=False)
+        #     Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=True)
 
-        if right is not None:
-            Ay = self.sqrt(4 - (Ax ** 2))
-        elif equi:
-            Ay = 2 * self.sqrt(self.const(3.0))
-        else:
-            AyLo = 1.1 if acute else 0.4
-            z = self.mkvar("tri")
-            Ay = self.const(AyLo) + 3.0 * self.sigmoid(z)
-
-        A = self.get_point(Ax, Ay)
+        # if right is not None:
+        #     Ay = self.sqrt(4 - (Ax ** 2))
+        # elif equi:
+        #     Ay = 2 * self.sqrt(self.const(3.0))
+        # else:
+        #     AyLo = 1.1 if acute else 0.4
+        #     z = self.mkvar("tri")
+        #     Ay = self.const(AyLo) + 3.0 * self.sigmoid(z)
+        # 
+        # A = self.get_point(Ax, Ay)
 
         # Shuffle if the isosceles vertex was not C
         if iso == nB or right == nB:

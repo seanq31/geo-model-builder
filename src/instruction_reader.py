@@ -37,8 +37,46 @@ class InstructionReader:
         cmds = parse_sexprs(self.problem_lines)
         for cmd in cmds:
             try:
-                self.process_command(cmd)
-                self.compute_all_lines()
+                if len(cmd) >= 3 and cmd[2] in ['parallelogram', 'rectangle', 'square']:
+                    cmd_temp = cmd
+                    cmd = (cmd[0], cmd[1], 'polygon')
+                    self.process_command(cmd)
+                    cmd = cmd_temp
+                else:
+                    self.process_command(cmd)
+
+                #self.compute_all_lines()
+
+                try:
+                    if cmd[0] == 'param' and cmd[2][0] == 'right-tri':
+                        right_angle = cmd[2][1]
+                        res_angles = [x for x in cmd[1] if x != right_angle]
+                        cmd_new = ('assert', ('perp', ('line', right_angle, res_angles[0]), ('line', right_angle, res_angles[1])))
+                        self.process_command(cmd_new)
+                    
+                    if cmd[0] == 'param' and cmd[2][0] == 'iso-tri':
+                        iso_angle = cmd[2][1]
+                        res_angles = [x for x in cmd[1] if x != iso_angle]
+                        cmd_new = ('assert', ('=', ('dist', iso_angle, res_angles[0]), ('dist', iso_angle, res_angles[1])))
+                        self.process_command(cmd_new)
+
+                    if cmd[0] == 'param' and cmd[2] in ['parallelogram', 'rectangle', 'square']:
+                        angles = cmd[1]
+                        cmd_new = ('assert', ('para', ('line', angles[0], angles[1]), ('line', angles[2], angles[3])))
+                        self.process_command(cmd_new)
+                        cmd_new = ('assert', ('para', ('line', angles[0], angles[3]), ('line', angles[1], angles[2])))
+                        self.process_command(cmd_new)
+
+                        if cmd[2] in ['rectangle', 'square']:
+                            cmd_new = ('assert', ('perp', ('line', angles[0], angles[1]), ('line', angles[0], angles[3])))
+                            self.process_command(cmd_new)
+
+                            if cmd[2] == 'square':
+                                cmd_new = ('assert', ('=', ('dist', angles[0], angles[1]), ('dist', angles[0], angles[3])))
+                                self.process_command(cmd_new)
+                except:
+                    1
+
             except:
                 raise RuntimeError(f"Invalid command: {cmd}")
             
