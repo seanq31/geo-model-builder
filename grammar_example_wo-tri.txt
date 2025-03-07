@@ -1,0 +1,207 @@
+以下内容是GMBL语法下define函数能够使用的function,第一列是function名称及形式,第二列是define出来的类型,第三列是这个function的含义。完整语句的形式为(define XXX OBJECT_TYPE (function ...))。
+(amidp-opp A B C),点,弧AB(不包含C)的中点
+(amidp-same A B C),点,弧ACB的中点
+(centroid A B C),点,三角形ABC的重心
+(circumcenter A B C),点,三角形ABC的外心
+(excenter A B C),点,三角形ABC中角A对应的旁心
+(foot A L1),点,点A到直线L1的垂足
+(incenter A B C),点,三角形ABC的内心
+(inter-cc C1 C2 <root-selector>),点,圆C1和圆C2的交点
+(inter-ll L1 L2),点,直线L1和直线L2的交点
+(inter-lc L1 C1 <root-selector>),点,直线L1和圆C1的交点
+(midp A B),点,线段AB的中点
+(orthocenter A B C),点,三角形ABC的垂心
+(line A B),线,直线AB
+(perp-bis A B),线,线段AB的垂直平分线
+(perp-at A L1),线,过点A且垂直与直线L1的直线
+(reflect-ll L1 L2),线,线L1关于L2的对称线
+(circ A B C),圆,过点A、点B、点C的圆
+(circumcircle A B C),圆,三角形ABC的外接圆
+(excircle A B C),圆,三角形ABC的角A对应的旁切圆
+(incircle A B C),圆,三角形ABC的内切圆
+(diam A B),圆,以线段AB为直径的圆
+(coa A B),圆,以点A为圆心且经过点B的圆
+(add N1 N2),数,N1加N2
+(area A B C),数,三角形ABC的面积
+(dist A B),数,线段AB的长度
+(div N1 N2),数,N1除以N2
+(mul N1 N2),数,N1乘以N2
+pi,数,圆周率数值
+(pow N1 N2),数,N1的N2次方
+(neg N1),数,负N1
+(radius C1),数,圆C1的半径
+(sqrt N1),数,根号N1
+(uangle A B C),数,角ABC的角度
+
+
+以下内容是GMBL语法下assert函数和eval函数能够使用的predicate,第一列是predicate名称及形式,第二列是这个predicate的含义。assert函数定义了几何图需要满足的predicate, eval函数定义的是需要验证的结论。完整语句的形式为(assert (predicate ...))或者(eval (predicate ...))。
+(concur L1 L2 L3),直线L1、L2、L3交于一点
+(cong A B C D),|AB| = |CD|
+(con-tri A B C D E F),三角形ABC和三角形DEF全等
+(coll A B C),点A、点B、点C三点共线
+(cycl P1 ... PN ),点P1、…、点PN共圆
+(= A B),点A和点B是同一个点
+(= N1 N2),N1等于N2
+(eq-ratio A B C D E F G H),|AB|除以|CD| = |EF|除以|GH|
+(foot P A L1),点P是点A到直线L1的垂足
+(> N1 N2),N1大于N2
+(>= N1 N2),N1大于等于N2
+(gt N1 N2),N1大于N2
+(gte N1 N2),N1大于等于N2
+(inter-ll P L1 L2),点P是直线L1和L2的交点
+(< N1 N2),N1小于N2
+(<= N1 N2),N1小于等于N2
+(lt N1 N2),N1小于N2
+(lte N1 N2),N1小于等于N2
+(midp P A B),点P是线段AB的中点
+(on-circ P C1),点P在圆C1上
+(on-line P L1),点P在直线L1上
+(on-ray P A B),点P在向量AB上
+(on-seg P A B),点P在线段AB上
+(opp-sides A B L1),点A和点B在直线L1的两侧
+(perp L1 L2),直线L1垂直于直线L2
+(para L1 L2),直线L1平行于直线L2
+(same-side A B L1),点A和点B在直线L1的同侧
+(sim-tri A B C D E F),三角形ABC和三角形DEF相似
+
+
+以下内容是GMBL语法下param函数能够使用的parameterization,第一列是parameterization名称及形式,第二列是param出来的类型,第三列是这个parameterization的含义。完整语句的形式为(param XXX OBJECT_TYPE (parameterization ...))。
+(on-circ C1),在圆C1上,的点
+(on-line L1),在直线L1上,的点
+(on-major-arc C1 A B),在圆C1中的优弧AB上,的点
+(on-minor-arc C1 A B),在圆C1中的劣弧AB上,的点
+(in-poly P1 ... PN ),在多边形P1，…，PN内,的点
+(on-ray A B),在向量AB上,的点
+(on-ray-opp A B),在向量BA上,的点
+(on-seg A B),在线段AB上,的点
+(tangent-lc C1),与圆C1相切,的线
+(through A),经过点A,的线
+(tangent-cc C1),与圆C1相切,的圆
+(tangent-cl L1),与直线L1相切,的圆
+(through A),经过点A,的圆
+(origin A),以A为圆心,的圆
+
+
+以下内容是GMBL语法下root-selector对应的root-selector形式,第一列是整个root-selector的示例,第二列是这个root-selector的含义。
+rs-arbitrary,任意一个解,
+(rs-neq A),与点A不同的解,
+(rs-opp-sides A L1),与点A在直线L1不同侧的解,
+(rs-same-side A L1),与点A在直线L1同侧的解,
+(rs-closer-to-p A),与点A更接近的解,
+(rs-closer-to-l L1),与直线L1更接近的解,
+
+
+以下内容是GMBL语法画几何图的示例
+;; eg1
+(param A point)
+(param B point)
+(param C point)
+(param D point)
+(assert (on-seg D A B))
+(eval (coll A B C))
+
+;; eg2
+(param A point)
+(param B point)
+(param C point)
+(param X point (on-seg (midp A B) B))
+(eval (on-seg (midp A B) A B))
+
+;; eg3
+(param A point)
+(param B point)
+(param C point)
+(param D point)
+(param E point)
+(define Gamma circle (incircle (midp A (midp B E)) D C))
+(eval (coll A B D))
+
+;; eg4
+(param lineA line)
+(param gamma circle)
+(define D point (inter-lc lineA gamma rs-arbitrary))
+(define E point (inter-lc lineA gamma (rs-neq D)))
+(eval (on-circ D gamma))
+
+;; eg5
+(param A point)
+(param B point)
+(param C point)
+(assert (= (dist A C) (dist A B)))
+(define gamma CIRCLE (circumciRcle A B C))
+(param D point (on-circ gamma))
+(eval (on-circ D gamma))
+
+;; eg6
+(param circA circle)
+(param circB circle)
+(assert (tangent-cc circA circB))
+(eval (tangent-cc circA circB))
+
+;; eg7
+(param A point)
+(param B point)
+(param C point)
+(param myLine line (through A))
+(eval (coll A B C))
+
+;; eg8
+(param A point)
+(param B point)
+(param C point)
+(param D point)
+(define E line (reflect-ll (line C D) (line A B)))
+(eval (coll A B C))
+
+;; eg9
+(param Gamma circle)
+(param l line)
+(define A point (inter-lc l Gamma rs-arbitrary))
+(define B point (inter-lc l Gamma (rs-neq A)))
+(param Omega circle)
+(define C point (inter-lc l Omega (rs-closer-to-p A)))
+(define D point (inter-lc l Omega (rs-neq C)))
+(define E point (inter-cc Gamma Omega (rs-closer-to-l l)))
+(define F point (inter-cc Gamma Omega (rs-neq E)))
+
+;; eg10
+(param myLine line)
+(param A point)
+(define B point (reflect-pl A myLine))
+(eval (on-line A myLine))
+
+;; eg11
+(param Gamma circle)
+(param A point (on-circ Gamma))
+(param B point (on-circ Gamma))
+(param C point (on-major-arc Gamma B A))
+(eval (coll A B C))
+
+;; eg12
+(param Gamma circle)
+(param l line)
+(define A point (inter-lc l Gamma rs-arbitrary))
+(define B point (inter-lc l Gamma (rs-neq A)))
+(param Omega circle)
+(define C point (inter-lc l Omega (rs-closer-to-p A)))
+(define D point (inter-lc l Omega (rs-neq C)))
+(define E point (inter-cc Gamma Omega (rs-closer-to-l l)))
+(define F point (inter-cc Gamma Omega (rs-neq E)))
+
+;; eg13
+(param A point)
+(param B point)
+(param C point)
+(assert (= (dist A B) 5))
+(assert (= (dist A C) (mul (dist A B) 2)))
+(eval (= (dist A C) 10))
+
+;; eg14
+(param A point)
+(param B point)
+(param C point)
+(define M point (midp A B))
+(define N point (midp A C))
+(assert (= (uangle A B C) (mul pi 0.2)))
+(assert (= (uangle B A C) (mul pi 0.3)))
+(eval (= (uangle A N M) (mul pi 0.5)))

@@ -383,7 +383,8 @@ class Optimizer(ABC):
 
 
     def sample_polygon(self, ps):
-        if len(ps) < 4:
+        #if len(ps) < 4:
+        if len(ps) < 3:
             if self.verbosity > 0:
                 print("WARNING: sample_polygon expecting >3 points")
 
@@ -457,7 +458,8 @@ class Optimizer(ABC):
         if iso is not None or equi:
             Ax = self.const(0)
         else:
-            Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=False)
+            #Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=False)
+            Ax = self.mkvar("tri_x", lo=-1.2, hi=1.2, trainable=True)
 
         if right is not None:
             Ay = self.sqrt(4 - (Ax ** 2))
@@ -837,7 +839,7 @@ class Optimizer(ABC):
             return diffs
         elif pred == "dist-lt":
             X, Y, A, B = self.lookup_pts(args)
-            return [self.max(self.const(0.0), self.dist(X, Y) - dist(A, B))]
+            return [self.max(self.const(0.0), self.dist(X, Y) - self.dist(A, B))]
         elif pred == "dist-gt":
             X, Y, A, B = self.lookup_pts(args)
             return [self.max(self.const(0.0), self.dist(A, B) - self.dist(X, Y))]
