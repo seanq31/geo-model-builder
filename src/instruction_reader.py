@@ -75,7 +75,7 @@ class InstructionReader:
                                 cmd_new = ('assert', ('=', ('dist', angles[0], angles[1]), ('dist', angles[0], angles[3])))
                                 self.process_command(cmd_new)
                 except:
-                    1
+                    raise RuntimeError(f"Invalid special parameterization: {cmd}")
 
             except:
                 raise RuntimeError(f"Invalid command: {cmd}")

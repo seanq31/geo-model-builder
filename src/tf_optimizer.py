@@ -161,7 +161,10 @@ class TfOptimizer(Optimizer):
 
 
     def register_loss(self, key, val, weight=1.0, requires_train=True):
-        assert(key not in self.losses)
+        #assert(key not in self.losses)
+        if key in self.losses:
+            return
+
         # TF has a bug that causes nans when differentiating something exactly 0
         self.losses[key] = weight * self.mk_zero(val + 1e-6 * (random.random() / 2))
         if requires_train:
@@ -338,7 +341,8 @@ class TfOptimizer(Optimizer):
 
             # Stop when we have enough
             if len(models) >= self.opts['n_models']:
-                if self.has_loss: self.remove_inits()
+                # if self.has_loss: 
+                #     self.remove_inits()
                 return models
 
             if not self.has_loss:
@@ -356,5 +360,6 @@ class TfOptimizer(Optimizer):
                 if loss is not None and loss < self.opts['eps']:
                     if self.valid_model():
                         models.append(self.get_model())
-        if self.has_loss: self.remove_inits()
+        # if self.has_loss: 
+        #     self.remove_inits()
         return models
