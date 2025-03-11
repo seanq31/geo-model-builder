@@ -11,6 +11,51 @@ from multiprocessing import Pool
 import pickle
 import datetime
 
+# Parse arguments
+parser = argparse.ArgumentParser(description='Arguments for building a model that satisfies a set of geometry constraints')
+
+# General arguments
+parser.add_argument('--problem', '-p', action='store', type=str, help='Name of the file defining the set of constraints')
+parser.add_argument('--dir', '-d', action='store', type=str, help='Directory containing problem files.')
+parser.add_argument('--regularize_points', action='store', dest='regularize_points', type=float, default=DEFAULTS["regularize_points"])
+parser.add_argument('--make_distinct', action='store', dest='make_distinct', type=float, default=DEFAULTS["make_distinct"])
+parser.add_argument('--distinct_prob', action='store', dest='distinct_prob', type=float, default=DEFAULTS["distinct_prob"])
+parser.add_argument('--min_dist', action='store', dest='min_dist', type=float, default=DEFAULTS["min_dist"])
+parser.add_argument('--ndg_loss', action='store', dest='ndg_loss', type=float, default=DEFAULTS["ndg_loss"])
+
+parser.add_argument('--n_models', action='store', dest='n_models', type=int, default=DEFAULTS['n_models'])
+parser.add_argument('--n_tries', action='store', dest='n_tries', type=int, default=DEFAULTS['n_tries'])
+parser.add_argument('--n_inits', action='store', dest='n_inits', type=int, default=DEFAULTS['n_inits'])
+parser.add_argument('--verbosity', action='store', dest='verbosity', type=int, default=DEFAULTS['verbosity'])
+parser.add_argument('--enforce_goals', dest='enforce_goals', action='store_true')
+parser.add_argument('--plot_freq', action='store', dest='plot_freq', type=int, default=DEFAULTS['plot_freq'])
+parser.add_argument('--loss_freq', action='store', dest='loss_freq', type=int, default=DEFAULTS['loss_freq'])
+parser.add_argument('--losses_freq', action='store', dest='losses_freq', type=int, default=DEFAULTS['losses_freq'])
+
+parser.add_argument('--unnamed_objects', dest='unnamed_objects', action='store_true')
+parser.add_argument('--no_unnamed_objects', dest='unnamed_objects', action='store_false')
+parser.set_defaults(unnamed_objects=True)
+
+# Tensorflow arguments
+parser.add_argument('--learning_rate', action='store', dest='learning_rate', type=float, default=DEFAULTS["learning_rate"])
+parser.add_argument('--decay_steps', action='store', dest='decay_steps', type=float, default=DEFAULTS["decay_steps"])
+parser.add_argument('--decay_rate', action='store', dest='decay_rate', type=float, default=DEFAULTS["decay_rate"])
+parser.add_argument('--n_iterations', action='store', dest='n_iterations', type=int, default=DEFAULTS["n_iterations"])
+parser.add_argument('--eps', action='store', dest='eps', type=float, default=DEFAULTS["eps"])
+
+parser.add_argument('--experiment', dest='experiment', action='store_true')
+
+parser.add_argument("--f", type=str, default='abc.def')
+
+global args
+args = parser.parse_args()
+args = vars(args)
+
+args['n_tries'] = 10
+args['eps'] = 5e-5
+args['n_iterations'] = 10000
+args['verbosity'] = -2
+
 
 def llm_generate(messages):
     messages, input_caption = messages
@@ -63,53 +108,8 @@ def gmb_draw(inputs):
         except:
             raise RuntimeError("No code block found in the reasoning content or content")
         
-    # Parse arguments
-    parser = argparse.ArgumentParser(description='Arguments for building a model that satisfies a set of geometry constraints')
-
-    # General arguments
-    parser.add_argument('--problem', '-p', action='store', type=str, help='Name of the file defining the set of constraints')
-    parser.add_argument('--dir', '-d', action='store', type=str, help='Directory containing problem files.')
-    parser.add_argument('--regularize_points', action='store', dest='regularize_points', type=float, default=DEFAULTS["regularize_points"])
-    parser.add_argument('--make_distinct', action='store', dest='make_distinct', type=float, default=DEFAULTS["make_distinct"])
-    parser.add_argument('--distinct_prob', action='store', dest='distinct_prob', type=float, default=DEFAULTS["distinct_prob"])
-    parser.add_argument('--min_dist', action='store', dest='min_dist', type=float, default=DEFAULTS["min_dist"])
-    parser.add_argument('--ndg_loss', action='store', dest='ndg_loss', type=float, default=DEFAULTS["ndg_loss"])
-
-    parser.add_argument('--n_models', action='store', dest='n_models', type=int, default=DEFAULTS['n_models'])
-    parser.add_argument('--n_tries', action='store', dest='n_tries', type=int, default=DEFAULTS['n_tries'])
-    parser.add_argument('--n_inits', action='store', dest='n_inits', type=int, default=DEFAULTS['n_inits'])
-    parser.add_argument('--verbosity', action='store', dest='verbosity', type=int, default=DEFAULTS['verbosity'])
-    parser.add_argument('--enforce_goals', dest='enforce_goals', action='store_true')
-    parser.add_argument('--plot_freq', action='store', dest='plot_freq', type=int, default=DEFAULTS['plot_freq'])
-    parser.add_argument('--loss_freq', action='store', dest='loss_freq', type=int, default=DEFAULTS['loss_freq'])
-    parser.add_argument('--losses_freq', action='store', dest='losses_freq', type=int, default=DEFAULTS['losses_freq'])
-
-    parser.add_argument('--unnamed_objects', dest='unnamed_objects', action='store_true')
-    parser.add_argument('--no_unnamed_objects', dest='unnamed_objects', action='store_false')
-    parser.set_defaults(unnamed_objects=True)
-
-    # Tensorflow arguments
-    parser.add_argument('--learning_rate', action='store', dest='learning_rate', type=float, default=DEFAULTS["learning_rate"])
-    parser.add_argument('--decay_steps', action='store', dest='decay_steps', type=float, default=DEFAULTS["decay_steps"])
-    parser.add_argument('--decay_rate', action='store', dest='decay_rate', type=float, default=DEFAULTS["decay_rate"])
-    parser.add_argument('--n_iterations', action='store', dest='n_iterations', type=int, default=DEFAULTS["n_iterations"])
-    parser.add_argument('--eps', action='store', dest='eps', type=float, default=DEFAULTS["eps"])
-
-    parser.add_argument('--experiment', dest='experiment', action='store_true')
-
-    parser.add_argument("--f", type=str, default='abc.def')
-
-
-    args = parser.parse_args()
-    args = vars(args)
-
-    args['n_tries'] = 10
-    args['eps'] = 5e-5
-    args['n_iterations'] = 10000
-    args['verbosity'] = -2
-
     args['lines'] = lines
-    
+
     try:
         res = build(args)
     except:
@@ -120,7 +120,7 @@ def gmb_draw(inputs):
 
 def try_generate_and_draw(messages):
     num_try_gen = 3
-    num_try_draw = 3
+    num_try_draw = 2
     cnt_try_gen = 0
 
     while cnt_try_gen < num_try_gen:
@@ -136,6 +136,14 @@ def try_generate_and_draw(messages):
                 continue
             else:
                 return res + contents_and_reasoning
+        
+        args['eps'] *= 5
+        res = gmb_draw(contents_and_reasoning)
+        args['eps'] /= 5
+        if res[1] == [] or res[1][0] is None:
+            continue
+        else:
+            return res + contents_and_reasoning
     
     return res + contents_and_reasoning
 
@@ -192,7 +200,7 @@ if __name__ == '__main__':
     grammer_example = ''.join(grammer_example)
 
     quest1 = '根据文档中的GMBL的语法和示例，使用GMBL语法，生成如下几何题对应的代码。'
-    quest2 = '请确保每个点在使用前都已经定义过，确保符合示例的GMBL语法，确保每一句语句都写在同一行，确保GMBL输入的角度是弧度制，确保没有形如(define XXX number xxx)或(param XXX number xxx)的语句，确保语句中没有使用and或者or。把最终回答放在代码block内。'
+    quest2 = '请确保每个点在使用前都已经定义过，确保没有重复定义点或者图形，确保符合示例的GMBL语法，确保每一句语句都写在同一行，确保GMBL输入的角度是弧度制，确保没有形如(define XXX number xxx)或(param XXX number xxx)的语句，确保语句中没有使用and或者or。把最终回答放在代码block内。'
     # quest3 = '列出所有需要连接的线段。'
 
     messages_list = [

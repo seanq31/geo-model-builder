@@ -1105,7 +1105,7 @@ class Optimizer(ABC):
         return self.trilinear(A, B, C, -1, 1, 1)
 
     def perp_phi(self, A, B, C, D):
-        return (A.x - B.x) * (C.x - D.x) + (A.y - B.y) * (C.y - D.y)
+        return ((A.x - B.x) * (C.x - D.x) + (A.y - B.y) * (C.y - D.y)) / 5
 
     def para_phi(self, A, B, C, D):
         return (A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x)
@@ -1582,14 +1582,24 @@ class Optimizer(ABC):
     def points_far_enough_away(self):
         name2pt = self.run(self.name2pt)
         min_dist = self.opts['min_dist']
-        for a, b in itertools.combinations(name2pt.keys(), 2):
-            A, B = name2pt[a], name2pt[b]
-            d = self.dist(A, B)
-            if d < min_dist:
-                if self.opts['verbosity'] >= 0:
-                    print(f"DUP: {a} {b}")
-                return False
+        # for a, b in itertools.combinations(name2pt.keys(), 2):
+        #     A, B = name2pt[a], name2pt[b]
+        #     d = self.dist(A, B)
+        #     if d < min_dist:
+        #         if self.opts['verbosity'] >= 0:
+        #             print(f"DUP: {a} {b}")
+        #         return False
+        # return True
+
+        distincts = [self.dist(name2pt[a], name2pt[b]) for a, b in itertools.combinations(name2pt.keys(), 2)]
+        ratio_max_min = min(distincts) / max(distincts) * 1.5
+        if ratio_max_min < min_dist and min(distincts) < min_dist:
+            if self.opts['verbosity'] >= 0:
+                print('There exist duplicate points!')
+            return False
+        
         return True
+    
 
     def diff_signs(self, x, y):
         return self.max(self.const(0.0), x * y)

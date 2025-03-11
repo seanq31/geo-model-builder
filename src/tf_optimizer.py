@@ -194,14 +194,16 @@ class TfOptimizer(Optimizer):
     def make_points_distinct(self):
         if random.random() < self.opts['distinct_prob']:
             distincts = tf.cast([self.dist(A, B) for A, B in itertools.combinations(self.name2pt.values(), 2)], tf.float64)
-            dloss     = tf.reduce_mean(self.mk_non_zero(distincts))
+            distincts_relative = tf.math.scalar_mul(5.0 / tf.reduce_max(distincts), distincts)
+            dloss     = tf.reduce_min(tf.stack([tf.reduce_mean(self.mk_non_zero(distincts)), tf.reduce_mean(self.mk_non_zero(distincts_relative))], 0))
             self.register_loss("distinct", dloss, self.opts['make_distinct'])
 
     def freeze(self):
         opts = self.opts
         self.regularize_points()
         self.make_points_distinct()
-        self.loss = sum(self.losses.values())
+        # self.loss = sum(self.losses.values())
+        self.loss = tf.reduce_max(list(self.losses.values()))
         self.global_step = tf.train.get_or_create_global_step()
         self.learning_rate = tf.train.exponential_decay(
             global_step=self.global_step,

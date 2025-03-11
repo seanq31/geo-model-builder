@@ -31,7 +31,7 @@ pi,数,圆周率数值
 (neg N1),数,负N1
 (radius C1),数,圆C1的半径
 (sqrt N1),数,根号N1
-(uangle A B C),数,角ABC的角度
+(uangle A B C),数,以B为顶点的角ABC的角度
 
 
 以下内容是GMBL语法下assert函数和eval函数能够使用的predicate,第一列是predicate名称及形式,第二列是这个predicate的含义。assert函数定义了几何图需要满足的predicate, eval函数定义的是需要验证的结论。完整语句的形式为(assert (predicate ...))或者(eval (predicate ...))。
