@@ -101,7 +101,7 @@ def gmb_draw(inputs):
             for ind in re_find:
                 inds += [ind.span()]
 
-            lines = content[inds[0][1] : inds[1][0]]
+            lines = reasoning_content[inds[0][1] : inds[1][0]]
             lines = lines.splitlines()[1:]
 
             print(lines)
@@ -115,8 +115,66 @@ def gmb_draw(inputs):
     except:
         res = [lines, [None]]
 
+    try:
+        if res[1] != [] and res[1][0] is not None:
+            segments_list = get_segments(content, reasoning_content)
+            dict_points = {ps.val: ps for ps in res[1][0].named_points}
+            for seg in segments_list:
+                ps_seg = tuple([res[1][0].named_points[dict_points[ps]] for ps in seg])
+                res[1][0].segments.append(ps_seg)
+                res[1][0].seg_colors.append([0, 0, 0])
+        else:
+            pass
+    except:
+        print("Fail to add additional segments!!!")
+
     return res + [input_caption]
+
+
+def get_segments(content, reasoning_content):
+    try:
+        re_find = re.finditer('```', content)
+        inds = []
+        for ind in re_find:
+            inds += [ind.span()]
+
+        re_find = re.finditer(';; segments to connect: ', content)
+        inds_seg = []
+        for ind in re_find:
+            inds_seg += [ind.span()]
+
+        lines = content[inds_seg[0][1] : inds[1][0]]
+        lines = lines.upper().splitlines()[0].split(' ')
+    except:
+        try:
+            re_find = re.finditer('```', reasoning_content)
+            inds = []
+            for ind in re_find:
+                inds += [ind.span()]
+
+            re_find = re.finditer(';; segments to connect: ', reasoning_content)
+            inds_seg = []
+            for ind in re_find:
+                inds_seg += [ind.span()]
+
+            lines = reasoning_content[inds_seg[0][1] : inds[1][0]]
+            lines = lines.upper().splitlines()[0].split(' ')
+        except:
+            raise RuntimeError("No segment list found in the reasoning content or content")
     
+    if lines is None or lines == []:
+        return []
+
+    segments_list = []
+    for segment in lines:
+        try:
+            assert(len(segment) == 2)
+            segments_list += [[segment[0], segment[1]]]
+        except:
+            print("Fail to get segment " + segment + " !!!")
+    
+    return segments_list
+
 
 def try_generate_and_draw(messages):
     num_try_gen = 3
@@ -149,15 +207,17 @@ def try_generate_and_draw(messages):
 
 
 if __name__ == '__main__':
+    time_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
     cnt = -1
     input_captions = []
     with open("C:\qinshenghao\桌面\geoqa_v2_99k_20250103.jsonl", 'r', encoding='utf-8') as f:
         for line in f:
             cnt += 1
             data = json.loads(line)
-            if cnt == 480:
+            if cnt == 29 * 32:
                 break
-            if cnt % 20 != 0:
+            if cnt % 29 != 0:
                 continue
 
             content = data['conversations'][1]['value']
@@ -200,20 +260,22 @@ if __name__ == '__main__':
     grammer_example = ''.join(grammer_example)
 
     quest1 = '根据文档中的GMBL的语法和示例，使用GMBL语法，生成如下几何题对应的代码。'
-    quest2 = '请确保每个点在使用前都已经定义过，确保没有重复定义点或者图形，确保符合示例的GMBL语法，确保每一句语句都写在同一行，确保GMBL输入的角度是弧度制，确保没有形如(define XXX number xxx)或(param XXX number xxx)的语句，确保语句中没有使用and或者or。把最终回答放在代码block内。'
-    # quest3 = '列出所有需要连接的线段。'
+    quest2 = '请确保每个点在使用前都已经定义过，确保没有重复定义点或者图形，确保符合示例的GMBL语法，确保每一句语句都写在同一行，确保GMBL输入的角度是弧度制，确保没有形如(define XXX number xxx)或(param XXX number xxx)的语句，确保语句中没有使用and或者or。'
+    quest3 = '把最终回答放在代码block内。最后列出所有需要连接的线段，以";; segments to connect: AB AC BC"的形式罗列。'
 
     messages_list = [
         [[{
         "role": "user", 
-        "content": grammer_example + '\n\n' + quest1 + input_caption + quest2
+        "content": grammer_example + '\n\n' + quest1 + input_caption + quest2 + quest3
         }], input_caption]
         for input_caption in input_captions]
 
     # with Pool(8) as p:
     #     res = p.map(llm_generate, messages_list)
     # llm_result_dict = {i: result for i, result in enumerate(res)}
-    # with open('../llm_gen/res_llm_gen.pkl', 'wb') as f:
+    # time_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    # file_name = '../llm_gen/res_llm_gen' + time_str + '.pkl'
+    # with open(file_name, 'wb') as f:
     #     pickle.dump(llm_result_dict, f)
 
     # # with open('../llm_gen/res_llm_gen.pkl', 'rb') as f:
@@ -243,7 +305,6 @@ if __name__ == '__main__':
         res = p.map(try_generate_and_draw, messages_list)
     res_all_in_one_dict = {i: result for i, result in enumerate(res)}
 
-    time_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     file_name = '../llm_gen/res_all_in_one_dict_' + time_str + '.pkl'
     with open(file_name, 'wb') as f:
         pickle.dump(res_all_in_one_dict, f)

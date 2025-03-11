@@ -42,7 +42,6 @@ pi,数,圆周率数值
 (cycl P1 ... PN ),点P1、…、点PN共圆
 (= A B),点A和点B是同一个点
 (= N1 N2),N1等于N2
-(eq-ratio A B C D E F G H),|AB|除以|CD| = |EF|除以|GH|
 (foot P A L1),点P是点A到直线L1的垂足
 (> N1 N2),N1大于N2
 (>= N1 N2),N1大于等于N2
@@ -190,6 +189,7 @@ rs-arbitrary,任意一个解,
 (param C point)
 (assert (= (dist A B) 5))
 (assert (= (dist A C) (mul (dist A B) 2)))
+(assert (= (dist B A) (div (dist C A) 2)))
 (eval (= (dist A C) 10))
 
 ;; eg14
