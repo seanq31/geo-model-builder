@@ -311,7 +311,7 @@ class TfOptimizer(Optimizer):
         return Diagram(
             named_points=named_pt_assn, named_lines=named_line_assn, named_circles=named_circ_assn,
             segments=segments, seg_colors=self.seg_colors, unnamed_points=unnamed_points, unnamed_lines=unnamed_lines,
-            unnamed_circles=unnamed_circles_assn, ndgs=ndgs, goals=goals)
+            unnamed_circles=unnamed_circles_assn, ndgs=ndgs, goals=goals, angle_to_annotate=[], segment_to_annotate=[])
 
     def run(self, x):
         return self.sess.run(x)

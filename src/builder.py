@@ -37,7 +37,6 @@ def build_aux(opts, show_plot=True, save_plot=False, outf_prefix=None, encode_fi
     if verbosity >= 0:
         print("INPUT INSTRUCTIONS:\n{instrs_str}".format(instrs_str="\n".join([str(i) for i in instructions])))
 
-
     g = tf.Graph()
     with g.as_default():
 
@@ -205,7 +204,6 @@ def build(opts, show_plot=True, save_plot=False, outf_prefix=None, encode_fig=Fa
             print(f"Goal total info: {all_trial_goal_total}")
             print(f"Goal success info: {all_trial_goal_success}")
             print(f"% Successful Problems with Goals Satisfied up to Tolerance: Avg {mean(perc_goals_satisfied)}, Sd {stdev(perc_goals_satisfied)}")
-            pdb.set_trace()
 
         else:
 

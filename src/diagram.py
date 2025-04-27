@@ -11,13 +11,178 @@ import pdb
 import numpy as np
 import math
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+from matplotlib.patches import Arc
+from matplotlib.transforms import Bbox, IdentityTransform, TransformedBbox
+
+from adjustText import adjust_text
+import matplotlib
+
 
 UNNAMED_ALPHA = 0.1
 MIN_AXIS_VAL = -10
 MAX_AXIS_VAL = 10
 
-class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", "named_circles", "segments", "seg_colors", "unnamed_points", "unnamed_lines", "unnamed_circles", "ndgs", "goals"])):
-    def plot(self, show=True, save=False, fname=None, return_fig=False, show_unnamed=True):
+
+class AngleAnnotation(Arc):
+    """
+    Draws an arc between two vectors which appears circular in display space.
+    """
+    def __init__(self, xy, p1, p2, size=55, unit="points", ax=None,
+                 text="", textposition="inside", text_kw=None, **kwargs):
+        """
+        Parameters
+        ----------
+        xy, p1, p2 : tuple or array of two floats
+            Center position and two points. Angle annotation is drawn between
+            the two vectors connecting *p1* and *p2* with *xy*, respectively.
+            Units are data coordinates.
+
+        size : float
+            Diameter of the angle annotation in units specified by *unit*.
+
+        unit : str
+            One of the following strings to specify the unit of *size*:
+
+            * "pixels": pixels
+            * "points": points, use points instead of pixels to not have a
+              dependence on the DPI
+            * "axes width", "axes height": relative units of Axes width, height
+            * "axes min", "axes max": minimum or maximum of relative Axes
+              width, height
+
+        ax : `matplotlib.axes.Axes`
+            The Axes to add the angle annotation to.
+
+        text : str
+            The text to mark the angle with.
+
+        textposition : {"inside", "outside", "edge"}
+            Whether to show the text in- or outside the arc. "edge" can be used
+            for custom positions anchored at the arc's edge.
+
+        text_kw : dict
+            Dictionary of arguments passed to the Annotation.
+
+        **kwargs
+            Further parameters are passed to `matplotlib.patches.Arc`. Use this
+            to specify, color, linewidth etc. of the arc.
+
+        """
+        self.ax = ax or plt.gca()
+        self._xydata = xy  # in data coordinates
+        self.vec1 = p1
+        self.vec2 = p2
+        self.size = size
+        self.unit = unit
+        self.textposition = textposition
+
+        t1 = self.get_theta1()
+        t2 = self.get_theta2()
+        if (t2 - t1) % 360 > 180:
+            self.vec1 = p2
+            self.vec2 = p1
+
+        super().__init__(self._xydata, size, size, angle=0.0,
+                         theta1=self.theta1, theta2=self.theta2, **kwargs)
+
+        self.set_transform(IdentityTransform())
+        self.ax.add_patch(self)
+
+        self.kw = dict(ha="center", va="center",
+                       xycoords=IdentityTransform(),
+                       xytext=(0, 0), textcoords="offset points",
+                       annotation_clip=True)
+        self.kw.update(text_kw or {})
+        self.text = ax.annotate(text, xy=self._center, color='blue', **self.kw)
+
+    def get_size(self):
+        factor = 1.
+        if self.unit == "points":
+            factor = self.ax.figure.dpi / 72.
+        elif self.unit[:4] == "axes":
+            b = TransformedBbox(Bbox.unit(), self.ax.transAxes)
+            dic = {"max": max(b.width, b.height),
+                   "min": min(b.width, b.height),
+                   "width": b.width, "height": b.height}
+            factor = dic[self.unit[5:]]
+        return self.size * factor
+
+    def set_size(self, size):
+        self.size = size
+
+    def get_center_in_pixels(self):
+        """return center in pixels"""
+        return self.ax.transData.transform(self._xydata)
+
+    def set_center(self, xy):
+        """set center in data coordinates"""
+        self._xydata = xy
+
+    def get_theta(self, vec):
+        vec_in_pixels = self.ax.transData.transform(vec) - self._center
+        return np.rad2deg(np.arctan2(vec_in_pixels[1], vec_in_pixels[0]))
+
+    def get_theta1(self):
+        return self.get_theta(self.vec1)
+
+    def get_theta2(self):
+        return self.get_theta(self.vec2)
+
+    def set_theta(self, angle):
+        pass
+
+    # Redefine attributes of the Arc to always give values in pixel space
+    _center = property(get_center_in_pixels, set_center)
+    theta1 = property(get_theta1, set_theta)
+    theta2 = property(get_theta2, set_theta)
+    width = property(get_size, set_size)
+    height = property(get_size, set_size)
+
+    # The following two methods are needed to update the text position.
+    def draw(self, renderer):
+        self.update_text()
+        super().draw(renderer)
+
+    def update_text(self):
+        c = self._center
+        s = self.get_size()
+        angle_span = (self.theta2 - self.theta1) % 360
+        angle = np.deg2rad(self.theta1 + angle_span / 2)
+        r = s * 0.65
+        # import pdb; pdb.set_trace()
+        if self.textposition == "inside":
+            r = s / np.interp(angle_span, [60, 90, 135, 180],
+                                          [3.3, 3.5, 3.8, 4])
+        self.text.xy = c + r * np.array([np.cos(angle), np.sin(angle)])
+        if self.textposition == "outside":
+            def R90(a, r, w, h):
+                if a < np.arctan(h/2/(r+w/2)):
+                    return np.sqrt((r+w/2)**2 + (np.tan(a)*(r+w/2))**2)
+                else:
+                    c = np.sqrt((w/2)**2+(h/2)**2)
+                    T = np.arcsin(c * np.cos(np.pi/2 - a + np.arcsin(h/2/c))/r)
+                    xy = r * np.array([np.cos(a + T), np.sin(a + T)])
+                    xy += np.array([w/2, h/2])
+                    return np.sqrt(np.sum(xy**2))
+
+            def R(a, r, w, h):
+                aa = (a % (np.pi/4))*((a % (np.pi/2)) <= np.pi/4) + \
+                     (np.pi/4 - (a % (np.pi/4)))*((a % (np.pi/2)) >= np.pi/4)
+                return R90(aa, r, *[w, h][::int(np.sign(np.cos(2*a)))])
+
+            bbox = self.text.get_window_extent()
+            X = R(angle, r, bbox.width, bbox.height)
+            trans = self.ax.figure.dpi_scale_trans.inverted()
+            offs = trans.transform(((X-s/2), 0))[0] * 72
+            self.text.set_position([offs*np.cos(angle), offs*np.sin(angle)])
+        self.text.xy = c + r * np.array([np.cos(angle), np.sin(angle)])
+            
+
+class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", "named_circles", "segments", "seg_colors", "unnamed_points", "unnamed_lines", "unnamed_circles", "ndgs", "goals", "angle_to_annotate", "segment_to_annotate"])):
+    def plot(self, show=True, save=False, fname=None, return_fig=False, show_unnamed=True, show_xy_axis=False):
 
         unnamed_points = self.unnamed_points
         unnamed_lines = self.unnamed_lines
@@ -139,14 +304,65 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
         if self.named_lines or self.named_circles:
             plt.legend()
 
-        if return_fig:
-            return plt
+        # Plot angle annotations
+        dict_points = {ps.val: ps for ps in self.named_points}
+        if self.angle_to_annotate != []:
+            angles_drawn = []
+            size_base = 30
+            size_add = 10
+            for angle in self.angle_to_annotate:
+                ps = []
+                for pname in angle[0]:
+                    ps.append(self.named_points[dict_points[pname]])
+                texts = angle[1]
+                # import pdb; pdb.set_trace()
+                size_angle = size_base
+                if angle[0][1] in angles_drawn:
+                    size_angle += size_add * angles_drawn.count(angle[0][1])
+                angles_drawn.append(angle[0][1])
+                am1 = AngleAnnotation(ps[1], ps[0], ps[2], size=size_angle, textposition="edge", ax=ax, text=texts, color='blue')
+
+        all_texts = [child for child in ax.get_children() if isinstance(child, matplotlib.text.Annotation)]
+        adjust_text(all_texts)
+        
+        # Plot segment annotations
+        dict_points = {ps.val: ps for ps in self.named_points}
+        # import pdb; pdb.set_trace()
+        if self.segment_to_annotate != []:
+            for segment in self.segment_to_annotate:
+                ps = []
+                for pname in segment[0]:
+                    ps.append(self.named_points[dict_points[pname]])
+                mid_ps = ps[0] + ps[1]
+                mid_ps = [item/2 for item in mid_ps]
+
+                vec_in_pixels = ps[0] - ps[1]
+                if vec_in_pixels[0] != 0:
+                    vec_in_pixels = [-vec_in_pixels[1]/vec_in_pixels[0], 1]
+                else:
+                    vec_in_pixels = [1, -vec_in_pixels[0]/vec_in_pixels[1]]
+                vec_in_pixels = vec_in_pixels / np.sqrt(np.power(vec_in_pixels[0], 2) + np.power(vec_in_pixels[1], 2))
+                offs = 0.1 * ax.figure.dpi / 72. 
+                offs = [offs*vec_in_pixels[0], offs*vec_in_pixels[1]]
+
+                # plt.text(mid_ps[0], mid_ps[1], f'{segment[0]}={segment[1]}', ha='center', va='bottom', color='red')
+                plt.text(mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5, str(segment[1]), ha='center', va='bottom', color='red')
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', color='red'))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', color='red'))
+
+        if not show_xy_axis:
+            plt.xticks([])
+            plt.yticks([])
+            plt.axis('off')
 
         if show:
             plt.show()
         if save:
             if fname is None:
                 raise RuntimeError("Must supply filename if saving plot")
-            if os.path.isfile(fname):
-                os.remove(fname)
+            # if os.path.isfile(fname):
+            #     os.remove(fname)
             plt.savefig(fname)
+
+        if return_fig:
+            return [fig, ax]
