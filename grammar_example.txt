@@ -34,7 +34,7 @@ pi,数,圆周率数值
 (uangle A B C),数,以B为顶点的角ABC的角度
 
 
-以下内容是GMBL语法下assert函数和eval函数能够使用的predicate,第一列是predicate名称及形式,第二列是这个predicate的含义。assert函数定义了几何图需要满足的predicate, eval函数定义的是需要验证的结论。完整语句的形式为(assert (predicate ...))或者(eval (predicate ...))。
+以下内容是GMBL语法下assert函数能够使用的predicate,第一列是predicate名称及形式,第二列是这个predicate的含义。assert函数定义了几何图需要满足的predicate，完整语句的形式为(assert (predicate ...))。
 (concur L1 L2 L3),直线L1、L2、L3交于一点
 (cong A B C D),|AB| = |CD|
 (con-tri A B C D E F),三角形ABC和三角形DEF全等
@@ -105,48 +105,40 @@ rs-arbitrary,任意一个解,
 (param (A B C) triangle)
 (param D point)
 (assert (on-seg D A B))
-(eval (coll A B C))
 
 ;; eg2
 (param (A B C) tri)
 (param X point (on-seg (midp A B) B))
-(eval (on-seg (midp A B) A B))
 
 ;; eg3
 (param (A B C) triangle)
 (param D point)
 (param E point)
 (define Gamma circle (incircle (midp A (midp B E)) D C))
-(eval (coll A B D))
 
 ;; eg4
 (param lineA line)
 (param gamma circle)
 (define D point (inter-lc lineA gamma rs-arbitrary))
 (define E point (inter-lc lineA gamma (rs-neq D)))
-(eval (on-circ D gamma))
 
 ;; eg5
 (PARAM (A B C) (iso-tri A))
 (define gamma CIRCLE (circumciRcle A B C))
 (param D point (on-circ gamma))
-(eval (on-circ D gamma))
 
 ;; eg6
 (param circA circle)
 (param circB circle)
 (assert (tangent-cc circA circB))
-(eval (tangent-cc circA circB))
 
 ;; eg7
 (param (A B C) triangle)
 (param myLine line (through A))
-(eval (coll A B C))
 
 ;; eg8
 (param (A B C D) polygon)
 (define E line (reflect-ll (line C D) (line A B)))
-(eval (coll A B C))
 
 ;; eg9
 (param Gamma circle)
@@ -163,14 +155,12 @@ rs-arbitrary,任意一个解,
 (param myLine line)
 (param A point)
 (define B point (reflect-pl A myLine))
-(eval (on-line A myLine))
 
 ;; eg11
 (param Gamma circle)
 (param A point (on-circ Gamma))
 (param B point (on-circ Gamma))
 (param C point (on-major-arc Gamma B A))
-(eval (coll A B C))
 
 ;; eg12
 (param Gamma circle)
@@ -190,17 +180,20 @@ rs-arbitrary,任意一个解,
 (assert (= (dist A B) 5))
 (assert (= (dist A C) (mul (dist A B) 2)))
 (assert (= (dist B A) (div (dist C A) 2)))
-(eval (= (dist A C) 10))
 
-;; eg14
-(param (A B C) triangle)
-(define M point (midp A B))
-(define N point (midp A C))
-(assert (= (uangle A B C) (mul pi 0.2)))
-(assert (= (uangle B A C) (mul pi 0.3)))
-(eval (= (uangle A N M) (mul pi 0.5)))
-
-;; eg 15
+;; eg 14
 (param (A B C D) parallelogram)
 (param (E F G H) rectangle)
 (param (I J K L) square)
+
+;; eg 15
+(param (A B C) triangle)
+(param (D E F) triangle)
+(assert (= (uangle A B C) (mul pi 0.5)))
+(assert (= (uangle B A C) (mul pi 0.25)))
+(assert (= (dist D E) 5))
+;; segments to connect: AB AC BC DE EF DF
+;; angle to annotate: ABC $90^\circ$
+;; angle to annotate: BAC $\frac{1}{4} \pi$
+;; segment to annotate: DE $5cm$
+;; segment to annotate: EF $10$
