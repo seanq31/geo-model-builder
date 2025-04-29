@@ -365,7 +365,8 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
                 vec_in_pixels = vec_in_pixels / np.sqrt(np.power(vec_in_pixels[0], 2) + np.power(vec_in_pixels[1], 2))
                 ratio_x = (ax.get_xlim()[1] - ax.get_xlim()[0]) / ax.bbox.width
                 ratio_y = (ax.get_ylim()[1] - ax.get_ylim()[0]) / ax.bbox.height
-                offs = 0.1 * ax.figure.dpi * np.sqrt(np.pow(ratio_x, 2) / 2 + np.pow(ratio_y, 2) / 2)
+                offs = 0.16 * ax.figure.dpi * np.sqrt(np.pow(ratio_x, 2) / 2 + np.pow(ratio_y, 2) / 2)
+                offs *= np.random.uniform(0.6, 1.5)
                 offs = [offs*vec_in_pixels[0], offs*vec_in_pixels[1]]
                 dir_off = 2 * np.random.binomial(1, 0.5, 1)[0] - 1
                 offs = [offs[0] * dir_off, offs[1] * dir_off]
@@ -375,12 +376,13 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
 
                 # plt.text(mid_ps[0], mid_ps[1], f'{segment[0]}={segment[1]}', ha='center', va='bottom', color='red')
                 # plt.text(mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5, str(segment[1]), ha='center', va='bottom', color='red')
-                ax.annotate(str(segment[1]), xy=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], xytext=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], textcoords=ax.transData, color='red')
+                # ax.annotate(str(segment[1]), xy=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], xytext=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], textcoords=ax.transData, color='red')
+                ax.text(mid_ps[0]+offs[0], mid_ps[1]+offs[1], str(segment[1]), ha='center', va='center', color='red', alpha=1)
 
-                ax.text(mid_ps[0]+offs[0], mid_ps[1]+offs[1], 'aa', ha='center', va='center', color='red', alpha=0)
+                # ax.text(mid_ps[0]+offs[0], mid_ps[1]+offs[1], 'aa', ha='center', va='center', color='red', alpha=0)
                 # ax.annotate('aa', xy=mid_ps, xytext=mid_ps, textcoords=ax.transData, alpha=0)
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', mutation_scale=6, color='red'))
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', mutation_scale=4, color='red'))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', mutation_scale=6, color='indianred', alpha=0.6))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', mutation_scale=4, color='indianred', alpha=0.6))
                 self.segments.append(tuple([ps[1], ps[0]]))
                 self.seg_colors.append([0, 0, 0])
 
