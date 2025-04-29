@@ -200,14 +200,16 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
 
         fig, ax = plt.subplots()
         
-        ax.scatter(xs, ys)
+        # ax.scatter(xs, ys)
+        ax.scatter(xs, ys, s=20)
         for i, n in enumerate(names):
-            ax.annotate(str(n), (xs[i], ys[i]))
+            # ax.annotate(str(n), (xs[i], ys[i]))
+            ax.text(xs[i], ys[i], str(n), color='purple', va='center', ha='center')
 
         # Plot unnamed points
         u_xs = [p.x for p in unnamed_points]
         u_ys = [p.y for p in unnamed_points]
-        ax.scatter(u_xs, u_ys, c="black", alpha=UNNAMED_ALPHA)
+        ax.scatter(u_xs, u_ys, s=20,  c="black", alpha=UNNAMED_ALPHA)
 
         # Plot named circles
         for (c_name, (O, r)) in self.named_circles.items():
@@ -296,8 +298,8 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
             l_name = l.val
             plot_line(L, l_name)
 
-        if self.named_lines or self.named_circles:
-            plt.legend()
+        # if self.named_lines or self.named_circles:
+        #     plt.legend()
 
         # Plot angle annotations
         dict_points = {ps.val: ps for ps in self.named_points}
@@ -307,11 +309,12 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
             size_add = 10
             for angle in self.angle_to_annotate:
                 ps = []
-                stop_add = True
+                # check whether to skip
+                skip_add = True
                 for pname in angle[0]:
                     ps.append(self.named_points[dict_points[pname]])
-                    stop_add = stop_add and (pname in angle[1])
-                if stop_add:
+                    skip_add = skip_add and (pname in angle[1])
+                if skip_add:
                     continue
                 texts = angle[1]
                 # import pdb; pdb.set_trace()
@@ -332,11 +335,24 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
         if self.segment_to_annotate != []:
             for segment in self.segment_to_annotate:
                 ps = []
-                stop_add = True
+                # check whether to skip
+                skip_add = True
                 for pname in segment[0]:
-                    stop_add = stop_add and (pname in segment[1])
+                    skip_add = skip_add and (pname in segment[1])
                     ps.append(self.named_points[dict_points[pname]])
-                if stop_add:
+                if skip_add:
+                    continue
+                if len(segment[1]) == 2 and segment[1].isalpha():
+                    skip_add = True
+                    for pname in segment[1]:
+                        skip_add = skip_add and (pname in dict_points.keys())
+                if skip_add:
+                    continue
+                if len(segment[1]) == 4 and segment[1][1:3].isalpha():
+                    skip_add = True
+                    for pname in segment[1][1:3]:
+                        skip_add = skip_add and (pname in dict_points.keys())
+                if skip_add:
                     continue
                 mid_ps = ps[0] + ps[1]
                 mid_ps = [item/2 for item in mid_ps]
@@ -347,16 +363,24 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
                 else:
                     vec_in_pixels = [1, -vec_in_pixels[0]/vec_in_pixels[1]]
                 vec_in_pixels = vec_in_pixels / np.sqrt(np.power(vec_in_pixels[0], 2) + np.power(vec_in_pixels[1], 2))
-                offs = 0.1 * ax.figure.dpi / 72. 
+                ratio_x = (ax.get_xlim()[1] - ax.get_xlim()[0]) / ax.bbox.width
+                ratio_y = (ax.get_ylim()[1] - ax.get_ylim()[0]) / ax.bbox.height
+                offs = 0.1 * ax.figure.dpi * np.sqrt(np.pow(ratio_x, 2) / 2 + np.pow(ratio_y, 2) / 2)
                 offs = [offs*vec_in_pixels[0], offs*vec_in_pixels[1]]
+                dir_off = 2 * np.random.binomial(1, 0.5, 1)[0] - 1
+                offs = [offs[0] * dir_off, offs[1] * dir_off]
+
+                # if segment[0] == 'AB' and segment[1] == '$3$':
+                #     import pdb; pdb.set_trace()
 
                 # plt.text(mid_ps[0], mid_ps[1], f'{segment[0]}={segment[1]}', ha='center', va='bottom', color='red')
                 # plt.text(mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5, str(segment[1]), ha='center', va='bottom', color='red')
                 ax.annotate(str(segment[1]), xy=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], xytext=[mid_ps[0]+offs[0]*0.5, mid_ps[1]+offs[1]*0.5], textcoords=ax.transData, color='red')
 
-                ax.annotate('aaa', xy=mid_ps, xytext=mid_ps, textcoords=ax.transData, alpha=0)
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', color='red'))
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', color='red'))
+                ax.text(mid_ps[0]+offs[0], mid_ps[1]+offs[1], 'aa', ha='center', va='center', color='red', alpha=0)
+                # ax.annotate('aa', xy=mid_ps, xytext=mid_ps, textcoords=ax.transData, alpha=0)
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', mutation_scale=6, color='red'))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', mutation_scale=4, color='red'))
                 self.segments.append(tuple([ps[1], ps[0]]))
                 self.seg_colors.append([0, 0, 0])
 
@@ -369,7 +393,9 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
                 continue
             # plt.plot([p1.x, p2.x],[p1.y, p2.y], c=c)
             plt.plot([p1.x, p2.x],[p1.y, p2.y], c=[0,0,0])
-            offs = 0.02 * ax.figure.dpi / 72. 
+            ratio_x = ax.bbox.width / (ax.get_xlim()[1] - ax.get_xlim()[0])
+            ratio_y = ax.bbox.height / (ax.get_ylim()[1] - ax.get_ylim()[0])
+            offs = 0.03 * ax.figure.dpi * np.sqrt(np.pow(1/ratio_x, 2) + np.pow(1/ratio_y, 2)) / 2
             # len_seg = np.sqrt(np.pow(p1[0]-p2[0],2) + np.pow(p1[1]-p2[1],2))
             # offs /= len_seg
             # ax.annotate("a", xy=[p1[ii]+(p2[ii]-p1[ii])*offs for ii in range(2)], xytext=[p2[ii]+(p1[ii]-p2[ii])*offs for ii in range(2)], textcoords=ax.transData, color='red', alpha=1)
@@ -377,7 +403,15 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
             ax.text(p1[0]+(p2[0]-p1[0])*offs, p1[1]+(p2[1]-p1[1])*offs, "a", color='red', alpha=0, va='center', ha='center')
             ax.text(p2[0]+(p1[0]-p2[0])*offs, p2[1]+(p1[1]-p2[1])*offs, "a", color='red', alpha=0, va='center', ha='center')
             seg_drawn.append((p1, p2))
-
+        
+        ax_lim0, ax_lim1 = ax.get_xlim()
+        ax_lim0 = ax_lim0 * 1.1 if ax_lim0 < 0 else ax_lim0 * 0.9
+        ax_lim1 = ax_lim1 * 1.1 if ax_lim1 > 0 else ax_lim1 * 0.9
+        ax.set_xlim(ax_lim0, ax_lim1)
+        ax_lim0, ax_lim1 = ax.get_ylim()
+        ax_lim0 = ax_lim0 * 1.1 if ax_lim0 < 0 else ax_lim0 * 0.9
+        ax_lim1 = ax_lim1 * 1.1 if ax_lim1 > 0 else ax_lim1 * 0.9
+        ax.set_ylim(ax_lim0, ax_lim1)
         all_texts = [child for child in ax.get_children() if isinstance(child, matplotlib.text.Text)]
         all_texts = list(filter(lambda x: x._text != '', all_texts))
         temp = adjust_text(all_texts, expand_axes=True)
