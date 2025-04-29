@@ -193,7 +193,8 @@ rs-arbitrary,任意一个解,
 (assert (= (uangle B A C) (mul pi 0.25)))
 (assert (= (dist D E) 5))
 ;; segments to connect: AB AC BC DE EF DF
-;; angle to annotate: ABC $90^\circ$
+;; angle to annotate: ABC $right_angle$
 ;; angle to annotate: BAC $\frac{1}{4} \pi$
+;; angle to annotate: BCA $45^\circ$
 ;; segment to annotate: DE $5cm$
 ;; segment to annotate: EF $10$
