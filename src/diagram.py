@@ -322,7 +322,13 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
                 if angle[0][1] in angles_drawn:
                     size_angle += size_add * angles_drawn.count(angle[0][1])
                 angles_drawn.append(angle[0][1])
-                am1 = AngleAnnotation(ps[1], ps[0], ps[2], size=size_angle, textposition="edge", ax=ax, text=texts, color='blue')
+                # if texts.replace(' ', '') in ['90', '$90$', '90^\\circ', '$90^\\circ$'] or texts.replace(' ', '') in ['\\frac{1}{2}\\pi', '\\frac{\\pi}{2}', '$\\frac{1}{2}\\pi$', '$\\frac{\\pi}{2}$'] or ('right' in texts and 'angle' in texts):
+                #     right_angle = matplotlib.patches.Rectangle(ps[1], 1, 1, ec="blue", fc='none')
+                #     ax.add_patch(right_angle)
+                # else:
+                #     if 'right' in texts or 'angle' in texts:
+                #         continue
+                ang_an = AngleAnnotation(ps[1], ps[0], ps[2], size=size_angle, textposition="edge", ax=ax, text=texts, color='blue')
 
                 self.segments.append(tuple([ps[1], ps[0]]))
                 self.seg_colors.append([0, 0, 0])
@@ -381,8 +387,8 @@ class Diagram(collections.namedtuple("Diagram", ["named_points", "named_lines", 
 
                 # ax.text(mid_ps[0]+offs[0], mid_ps[1]+offs[1], 'aa', ha='center', va='center', color='red', alpha=0)
                 # ax.annotate('aa', xy=mid_ps, xytext=mid_ps, textcoords=ax.transData, alpha=0)
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', mutation_scale=6, color='indianred', alpha=0.6))
-                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', mutation_scale=4, color='indianred', alpha=0.6))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='<->', mutation_scale=6, color='red', alpha=0.4))
+                ax.annotate("", xy=[ps[0][ii]+offs[ii] for ii in range(2)], xytext=[ps[1][ii]+offs[ii] for ii in range(2)], textcoords=ax.transData, arrowprops=dict(arrowstyle='|-|', mutation_scale=4, color='red', alpha=0.4))
                 self.segments.append(tuple([ps[1], ps[0]]))
                 self.seg_colors.append([0, 0, 0])
 
